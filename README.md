@@ -21,11 +21,11 @@ A premium, single-page personal portfolio built with plain **HTML, CSS and JavaS
 
 ## Sections
 
-1. **Hero:** headline, intro, call-to-action buttons, live stats, cut-out portrait over an outlined "KIRAN" wordmark, and floating highlight chips.
+1. **Hero:** headline, intro, call-to-action buttons, live stats, and an intro video that melts into the page and then becomes a cut-out portrait over the outlined "KIRAN" wordmark.
 2. **About:** bio, a 3D lanyard **developer ID card** that tilts with the mouse and flips on hover or tap (its QR code scans to LinkedIn), and a quick-facts panel.
 3. **Skills:** a "periodic table" of 33 skills with category filters and a live inspector that shows which projects use each skill.
 4. **Work:** the LearnX flagship card plus an expanding accordion of 9 projects. Each project has its own animated example UI.
-5. **Experience:** a scroll-driven timeline that lights up each stop as you scroll.
+5. **Experience:** a scroll-driven timeline from education to the current role, including the founder track and key contributions from the resume.
 6. **Achievements:** a drag-to-scroll carousel with count-up numbers.
 7. **Contact:** the email address with a copy button, phone numbers, social links, and a rotating "Say hello" button.
 
@@ -80,13 +80,17 @@ You can also use any static server, for example `python3 -m http.server 8787 --d
 
 Replace `YOUR-DOMAIN.com` in `html/robots.txt` and `html/sitemap.xml` with your real domain.
 
-## Adding your files
+## Media files
 
-| What | Where | Notes |
+| What | File(s) | How it's used |
 | --- | --- | --- |
-| **Resume PDF** | `html/assets/docs/Kiran-Kumar-Challa-Resume.pdf` | All "Resume" buttons and `/resume` use this file. Until it exists, the buttons open LinkedIn instead. |
-| **Intro video** (optional) | `html/assets/video/kiran-intro.mp4` | If the file exists, it plays in the hero (muted, with a sound toggle) in place of the photo. An MP4 (H.264) under ~8 MB works best. |
-| **Higher-resolution photos** | `html/assets/img/kiran-portrait.png` / `.webp` (600×940, transparent background) and `kiran-id.jpg` / `.webp` | The current images were taken from a screen recording. Swap in originals for sharper results. |
+| **Resume** | `html/assets/docs/Kiran-Kumar-Challa-Resume.pdf` | Opened by the "Resume" buttons and downloaded by "Download resume". The short link `/resume` points to it as well. |
+| **Intro video** | `html/assets/video/kiran-intro.mp4` (H.264/AAC) + `kiran-intro.webm` (VP9/Opus fallback) | Autoplays muted in the hero, with a **Sound on / Mute** toggle and a progress line. When it ends, it cross-fades into the cut-out portrait and the button becomes **Replay intro**. It pauses when scrolled off-screen, and it is skipped for visitors with *reduced motion* or *data saver* turned on. |
+| **Video poster** | `html/assets/img/intro-poster.webp` / `.jpg` | The first frame, shown while the video loads. |
+| **Portrait** | `html/assets/img/kiran-portrait.webp` / `.png` (768×1168, transparent) | A cut-out of the video's final frame, shown after the intro. |
+| **ID card photo** | `html/assets/img/kiran-id.webp` / `.jpg` | The photo on the lanyard ID card. |
+
+To replace the video, keep the same filenames. A portrait (vertical) clip with a light background works best.
 
 To change any text, edit `html/index.html`: every section is clearly commented. To add or remove skills tags on a project, edit that project's `data-skills` attribute. The skills inspector updates automatically.
 

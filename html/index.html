@@ -30,7 +30,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter+Tight:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
-  <link rel="preload" as="image" href="/assets/img/kiran-portrait.webp" type="image/webp">
+  <link rel="preload" as="image" href="/assets/img/intro-poster.webp" type="image/webp">
   <link rel="stylesheet" href="/assets/css/styles.css">
   <script>document.documentElement.classList.add("js")</script>
 
@@ -151,7 +151,7 @@
           <div class="hero-cta" data-reveal style="--d:.45s">
             <a class="btn btn--dark" href="#work">Explore work</a>
             <a class="btn" href="#contact">Let's talk</a>
-            <a class="btn" href="/assets/docs/Kiran-Kumar-Challa-Resume.pdf" data-resume target="_blank" rel="noopener">Resume</a>
+            <a class="btn" href="/assets/docs/Kiran-Kumar-Challa-Resume.pdf" target="_blank" rel="noopener">Resume</a>
           </div>
           <div class="stats" data-reveal style="--d:.55s">
             <div class="stat"><strong data-count="200" data-suffix="+">200+</strong><span>Global schools engaged</span></div>
@@ -160,12 +160,17 @@
           </div>
         </div>
 
-        <div class="hero-figure" data-reveal style="--d:.2s">
-          <picture class="breath">
-            <source srcset="/assets/img/kiran-portrait.webp" type="image/webp">
-            <img src="/assets/img/kiran-portrait.png" width="600" height="940" alt="Kiran Kumar Challa in a white shirt, standing and facing the camera" fetchpriority="high">
-          </picture>
-          <video id="intro-video" muted playsinline loop preload="none" poster="/assets/img/kiran-portrait.png" aria-label="Kiran's video introduction"></video>
+        <div class="hero-figure" id="hero-figure">
+          <div class="hero-stage">
+            <picture class="hero-portrait">
+              <source srcset="/assets/img/kiran-portrait.webp" type="image/webp">
+              <img src="/assets/img/kiran-portrait.png" width="768" height="1168" alt="Kiran Kumar Challa smiling, in a white shirt and dark trousers" fetchpriority="high">
+            </picture>
+            <video class="hero-video" id="intro-video" autoplay muted playsinline preload="auto" poster="/assets/img/intro-poster.webp" aria-label="Video introduction from Kiran Kumar Challa">
+              <source src="/assets/video/kiran-intro.mp4" type="video/mp4">
+              <source src="/assets/video/kiran-intro.webm" type="video/webm">
+            </video>
+          </div>
         </div>
 
         <ul class="hero-tags" aria-label="Highlights">
@@ -174,8 +179,8 @@
           <li class="chip">Founder product</li>
         </ul>
       </div>
-      <button class="btn btn--sm sound" type="button" id="sound-btn" aria-pressed="false">
-        <svg class="icon"><use href="#i-volume-x"/></svg><span>Unmute</span>
+      <button class="btn btn--sm sound" type="button" id="sound-btn" aria-pressed="false" aria-controls="intro-video">
+        <svg class="icon"><use href="#i-volume-x"/></svg><span>Sound on</span><i class="sound-progress" aria-hidden="true"></i>
       </button>
     </section>
 
@@ -188,7 +193,7 @@
           <p data-reveal>Results-driven AI Developer building end-to-end AI products — voice agents, chatbots, adaptive LMS &amp; SMS features, and investor-ready business decks. Combines Generative AI engineering with product thinking to deliver real impact. Proven international experience opening new markets, training entire organizations on newly launched AI products, and presenting at C-suite and large-audience scale across the Gulf region.</p>
           <p data-reveal>Founder of Preparation AI and AI Deployment Head for the LearnX school platform — extending AI across LMS &amp; SMS, voice, and classroom operations in Kuwait and the wider GCC.</p>
           <div class="about-cta" data-reveal>
-            <a class="btn btn--dark" href="/assets/docs/Kiran-Kumar-Challa-Resume.pdf" data-resume target="_blank" rel="noopener">Resume</a>
+            <a class="btn btn--dark" href="/assets/docs/Kiran-Kumar-Challa-Resume.pdf" target="_blank" rel="noopener">Resume</a>
             <a class="btn" href="https://www.linkedin.com/in/kiran-challa" target="_blank" rel="noopener">LinkedIn <svg class="icon"><use href="#i-arrow-up-right"/></svg></a>
             <a class="btn" href="https://preparationai.si" target="_blank" rel="noopener">Preparation AI <svg class="icon"><use href="#i-arrow-up-right"/></svg></a>
           </div>
@@ -301,7 +306,7 @@
             <button class="el" type="button" data-i="22" data-name="CI/CD" data-sym="Ci" data-cat="cloud" data-catname="Cloud &amp; Dev" data-icon="refresh-cw" aria-label="CI/CD — Cloud &amp; Dev"><span class="el-top"><span>22</span><svg class="icon" aria-hidden="true"><use href="#i-refresh-cw"/></svg></span><span class="el-sym">Ci</span><span class="el-name">CI/CD</span></button>
             <button class="el" type="button" data-i="23" data-name="Kubernetes" data-sym="Ku" data-cat="cloud" data-catname="Cloud &amp; Dev" data-icon="ship-wheel" aria-label="Kubernetes — Cloud &amp; Dev"><span class="el-top"><span>23</span><svg class="icon" aria-hidden="true"><use href="#i-ship-wheel"/></svg></span><span class="el-sym">Ku</span><span class="el-name">Kubernetes</span></button>
             <button class="el" type="button" data-i="24" data-name="Backend Development" data-sym="Be" data-cat="cloud" data-catname="Cloud &amp; Dev" data-icon="server" aria-label="Backend Development — Cloud &amp; Dev"><span class="el-top"><span>24</span><svg class="icon" aria-hidden="true"><use href="#i-server"/></svg></span><span class="el-sym">Be</span><span class="el-name">Backend Development</span></button>
-            <button class="el" type="button" data-i="25" data-name="Client Deployments &amp; Compliance" data-sym="Cd" data-cat="cloud" data-catname="Cloud &amp; Dev" data-icon="rocket" aria-label="Client Deployments &amp; Compliance — Cloud &amp; Dev"><span class="el-top"><span>25</span><svg class="icon" aria-hidden="true"><use href="#i-rocket"/></svg></span><span class="el-sym">Cd</span><span class="el-name">Client Deployments &amp; Compliance</span></button>
+            <button class="el" type="button" data-i="25" data-name="Cloud Deployments &amp; Compliance" data-sym="Cd" data-cat="cloud" data-catname="Cloud &amp; Dev" data-icon="rocket" aria-label="Cloud Deployments &amp; Compliance — Cloud &amp; Dev"><span class="el-top"><span>25</span><svg class="icon" aria-hidden="true"><use href="#i-rocket"/></svg></span><span class="el-sym">Cd</span><span class="el-name">Cloud Deployments &amp; Compliance</span></button>
             <button class="el" type="button" data-i="26" data-name="Investor Decks" data-sym="Id" data-cat="biz" data-catname="Product &amp; Business" data-icon="presentation" aria-label="Investor Decks — Product &amp; Business"><span class="el-top"><span>26</span><svg class="icon" aria-hidden="true"><use href="#i-presentation"/></svg></span><span class="el-sym">Id</span><span class="el-name">Investor Decks</span></button>
             <button class="el" type="button" data-i="27" data-name="Service Catalogues" data-sym="Sc" data-cat="biz" data-catname="Product &amp; Business" data-icon="library" aria-label="Service Catalogues — Product &amp; Business"><span class="el-top"><span>27</span><svg class="icon" aria-hidden="true"><use href="#i-library"/></svg></span><span class="el-sym">Sc</span><span class="el-name">Service Catalogues</span></button>
             <button class="el" type="button" data-i="28" data-name="Technical Documentation" data-sym="Td" data-cat="biz" data-catname="Product &amp; Business" data-icon="file-text" aria-label="Technical Documentation — Product &amp; Business"><span class="el-top"><span>28</span><svg class="icon" aria-hidden="true"><use href="#i-file-text"/></svg></span><span class="el-sym">Td</span><span class="el-name">Technical Documentation</span></button>
@@ -630,7 +635,7 @@
 
           <li class="stop">
             <div class="stop-card">
-              <div class="stop-when">2016 – 2023 <span class="tag tag--edu">Education</span></div>
+              <div class="stop-when">2016 – 2020 <span class="tag tag--edu">Education</span></div>
               <h3>Bachelor of Information Technology Engineering</h3>
               <div class="stop-org">SRM University (Main Campus) · Chennai, India</div>
               <p>Four-year engineering foundation in Information Technology — the technical base behind every system built since.</p>
@@ -679,10 +684,28 @@
 
           <li class="stop">
             <div class="stop-card">
+              <div class="stop-when">2025 — Present <span class="tag tag--founder">Founder</span></div>
+              <h3>Founder &amp; AI Product Developer</h3>
+              <div class="stop-org">Preparation AI · Tutor Amma.AI — self-founded EdTech AI products</div>
+              <p>Founded and independently built Preparation AI — an AI-native mock exam engine with real-time, topic-level analytics and a proprietary recommendation layer that surfaces targeted resources to close each student's specific gap. In parallel, launched Tutor Amma.AI: avatar-led tutor videos for B.Com and CBSE students, from prompt design and scripting to final production.</p>
+              <div class="chips stop-chips"><span class="chip">Concept → AI architecture → prototype</span><span class="chip">Self-funded</span><span class="chip">Modular, built to scale</span></div>
+            </div>
+          </li>
+
+          <li class="stop">
+            <div class="stop-card">
               <div class="stop-when">Jan 2026 — Present <span class="tag tag--now">Work · Now</span></div>
               <h3>AI Developer &amp; AI Development Head</h3>
               <div class="stop-org">KAM Global (Digital &amp; AI Media Solutions) · Bengaluru → Kuwait (KICCPA)</div>
-              <p>Appointed AI Developer for KAM International Group's Kuwait entity (KICCPA), extending across LMS &amp; SMS, AI and technology operations in Kuwait and the wider GCC. Opened an entirely new international market — visiting 200+ global schools in one month and presenting the full AI &amp; LMS &amp; SMS suite to founders, directors and R&amp;D heads.</p>
+              <p>Appointed AI Developer for KAM International Group's Kuwait entity, KICCPA (Kuwait International Company for Computer Programming Activities), extending across LMS &amp; SMS, AI and technology operations in Kuwait and the wider GCC. Opened an entirely new international market — visiting 200+ global schools in one month and presenting the full AI &amp; LMS &amp; SMS suite to founders, directors and R&amp;D heads.</p>
+              <ul class="duties">
+                <li><b>Field discovery → live product.</b> Ran on-ground needs assessments with school leadership, then designed and built a bespoke AI application solving those exact problems within a single field assignment.</li>
+                <li><b>Sole product authority &amp; demo lead.</b> End-to-end demonstrations of AI capabilities, LMS workflows, roadmap and school-management tools — engineer, strategist and brand ambassador at C-suite level.</li>
+                <li><b>Organisation-wide enablement.</b> Trained every department on the AI/LMS suite and delivered auditorium-scale launches of the full 25-module platform.</li>
+                <li><b>Content workflow &amp; QC.</b> Designed the AI Media Team's tracker-based pipeline with a two-stage QC gate and a dedicated GCC review layer — cited by leadership for bringing <em>“much-needed clarity on ownership, progress tracking, and workflow management.”</em></li>
+                <li><b>Internal AI automation.</b> Built custom GPTs, Gemini Gems and Claude Projects that automate curriculum scripting and lesson generation, cutting content production time significantly.</li>
+                <li><b>Business strategy.</b> Sole creator of investor pitch decks, service catalogues and enterprise proposals for KAM Global and KICCPA LMS; supports compliant cloud deployments across Kuwait/GCC.</li>
+              </ul>
               <div class="highlight"><b>Highlight</b><span>Independently designed and built 5 AI-powered school products from field discovery; trained every department on the AI/LMS &amp; SMS suite; delivered auditorium-scale demos of the full 25-module platform.</span></div>
             </div>
           </li>
@@ -790,7 +813,7 @@
 
             <div class="contact-cta">
               <a class="btn btn--dark" href="mailto:kkchalla@outlook.com?subject=Let%27s%20build%20something%20together">Start a conversation <svg class="icon i-right"><use href="#i-arrow-right"/></svg></a>
-              <a class="btn" href="/assets/docs/Kiran-Kumar-Challa-Resume.pdf" data-resume target="_blank" rel="noopener">Download resume <svg class="icon"><use href="#i-file-down"/></svg></a>
+              <a class="btn" href="/assets/docs/Kiran-Kumar-Challa-Resume.pdf" download="Kiran-Kumar-Challa-Resume.pdf">Download resume <small class="btn-meta">PDF</small> <svg class="icon"><use href="#i-file-down"/></svg></a>
             </div>
           </div>
         </div>

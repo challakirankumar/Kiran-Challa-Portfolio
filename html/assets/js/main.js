@@ -9,9 +9,6 @@
 
   const reduceMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
   const finePointer = matchMedia("(hover: hover) and (pointer: fine)").matches;
-  const RESUME_URL = "/assets/docs/Kiran-Kumar-Challa-Resume.pdf";
-  const INTRO_VIDEO_URL = "/assets/video/kiran-intro.mp4";
-  const LINKEDIN_URL = "https://www.linkedin.com/in/kiran-challa";
 
   /* ---------- Toast ---------- */
   const toastEl = $("#toast");
@@ -343,38 +340,63 @@
     }, 1800);
   }));
 
-  /* ---------- Optional assets: resume PDF and intro video ---------- */
-  const exists = (url) => fetch(url, { method: "HEAD", cache: "no-store" })
-    .then((r) => r.ok && !(r.headers.get("content-type") || "").includes("text/html"))
-    .catch(() => false);
-
-  exists(RESUME_URL).then((ok) => {
-    if (ok) return;
-    // No resume uploaded yet — point resume buttons at LinkedIn instead of a dead link.
-    $$("[data-resume]").forEach((a) => {
-      a.href = LINKEDIN_URL;
-      a.removeAttribute("download");
-      a.title = "Resume available on LinkedIn";
-    });
-  });
-
+  /* ---------- Hero intro video ---------- */
+  // Plays muted on load (browser autoplay rules), offers sound, then cross-fades
+  // into the cut-out portrait. Pauses while the hero is off-screen.
+  const figure = $("#hero-figure");
   const video = $("#intro-video");
   const soundBtn = $("#sound-btn");
-  exists(INTRO_VIDEO_URL).then((ok) => {
-    if (!ok || reduceMotion) return;
-    video.src = INTRO_VIDEO_URL;
-    video.closest(".hero-figure").classList.add("has-video");
-    soundBtn.classList.add("is-on");
-    video.play().catch(() => {});
+  const soundLabel = $("span", soundBtn);
+  const soundIcon = $("use", soundBtn);
+  const saveData = navigator.connection && navigator.connection.saveData;
+
+  const renderSound = () => {
+    const ended = figure.classList.contains("is-ended");
+    soundBtn.classList.toggle("is-replay", ended);
+    if (ended) {
+      soundLabel.textContent = "Replay intro";
+      soundIcon.setAttribute("href", "#i-rotate-ccw");
+      soundBtn.setAttribute("aria-pressed", "false");
+    } else {
+      soundLabel.textContent = video.muted ? "Sound on" : "Mute";
+      soundIcon.setAttribute("href", video.muted ? "#i-volume-x" : "#i-volume-2");
+      soundBtn.setAttribute("aria-pressed", String(!video.muted));
+    }
+  };
+  const endIntro = () => { figure.classList.add("is-ended"); renderSound(); };
+  const playIntro = (withSound) => {
+    figure.classList.remove("is-ended");
+    if (video.ended || video.currentTime > video.duration - 0.2) video.currentTime = 0;
+    video.muted = !withSound;
+    video.play().catch(() => { video.muted = true; video.play().catch(endIntro); });
+    renderSound();
+  };
+
+  video.addEventListener("ended", endIntro);
+  video.addEventListener("error", endIntro, true);
+  video.addEventListener("timeupdate", () => {
+    if (video.duration) soundBtn.style.setProperty("--p", video.currentTime / video.duration);
   });
   soundBtn.addEventListener("click", () => {
-    if (video.ended) { video.currentTime = 0; video.play(); }
+    if (figure.classList.contains("is-ended")) return playIntro(true);
+    if (video.paused) return playIntro(true);
     video.muted = !video.muted;
-    if (!video.muted && video.paused) video.play();
-    soundBtn.setAttribute("aria-pressed", !video.muted);
-    $("span", soundBtn).textContent = video.muted ? "Unmute" : "Mute";
-    $("use", soundBtn).setAttribute("href", video.muted ? "#i-volume-x" : "#i-volume-2");
+    renderSound();
   });
+
+  if (reduceMotion || saveData) {
+    video.removeAttribute("autoplay");
+    video.pause();
+    endIntro();
+  } else {
+    video.play().catch(endIntro); // autoplay blocked → show the portrait
+    new IntersectionObserver(([entry]) => {
+      if (figure.classList.contains("is-ended")) return;
+      if (entry.isIntersecting) video.play().catch(() => {});
+      else video.pause();
+    }, { threshold: 0.15 }).observe(figure);
+  }
+  renderSound();
 
   /* ---------- Footer year ---------- */
   const year = $("#year");
