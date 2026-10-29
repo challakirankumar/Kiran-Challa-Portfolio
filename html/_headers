@@ -1,0 +1,30 @@
+# Cloudflare Pages / Workers Static Assets — response headers
+/*
+  X-Content-Type-Options: nosniff
+  X-Frame-Options: DENY
+  Referrer-Policy: strict-origin-when-cross-origin
+  Permissions-Policy: camera=(), microphone=(), geolocation=(), interest-cohort=()
+  Strict-Transport-Security: max-age=31536000; includeSubDomains
+  Cross-Origin-Opener-Policy: same-origin
+  Content-Security-Policy: default-src 'self'; script-src 'self' 'sha256-qOhFsq0QMV2REqNwk5hGH5bZE9SkX6gt6yeyKdYPv+U='; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data:; media-src 'self'; connect-src 'self'; frame-ancestors 'none'; base-uri 'self'; form-action 'self' mailto:
+
+/
+  Cache-Control: public, max-age=0, must-revalidate
+
+/*.html
+  Cache-Control: public, max-age=0, must-revalidate
+
+/assets/css/*
+  Cache-Control: public, max-age=604800, stale-while-revalidate=86400
+
+/assets/js/*
+  Cache-Control: public, max-age=604800, stale-while-revalidate=86400
+
+/assets/img/*
+  Cache-Control: public, max-age=2592000, stale-while-revalidate=86400
+
+/assets/video/*
+  Cache-Control: public, max-age=2592000
+
+/assets/docs/*
+  Cache-Control: public, max-age=3600
