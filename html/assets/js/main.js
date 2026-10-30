@@ -208,9 +208,7 @@
     tiles.forEach((t) => t.classList.toggle("is-selected", t === tile));
     const d = tile.dataset;
     ins.idx.textContent = String(d.i).padStart(2, "0");
-    ins.sym.textContent = d.sym;
-    ins.icon.setAttribute("href", "#" + d.icon);
-    ins.tile.style.setProperty("--c", d.color);
+    ins.img.src = d.img;
     ins.name.textContent = d.name;
     ins.meta.textContent = `${d.catname} · Symbol ${d.sym}`;
     const used = usage[d.name] || [];
@@ -351,7 +349,6 @@
   const canvas = $("#hero-canvas");
   const video = $("#intro-video");
   const soundBtn = $("#sound-btn");
-  const tapHear = $("#tap-hear");
   const btnLabel = $("span", soundBtn);
   const btnIcon = $("use", soundBtn);
   const saveData = !!(navigator.connection && navigator.connection.saveData);
@@ -454,7 +451,7 @@
     let label = "Mute", icon = "#i-volume-2";
     if (state === "idle") { label = "Play"; icon = "#i-play"; }
     else if (state === "ended") { label = "Replay"; icon = "#i-volume-2"; }
-    else if (video.muted) { label = "Sound on"; icon = "#i-volume-x"; }
+    else if (video.muted) { label = "Tap to hear"; icon = "#i-volume-2"; }
     btnLabel.textContent = label;
     btnIcon.setAttribute("href", icon);
     soundBtn.setAttribute("aria-label", state === "playing" ? (video.muted ? "Turn sound on" : "Mute") : label);
@@ -495,11 +492,10 @@
     if (video.paused) { video.muted = false; video.play().catch(() => {}); return render(); }
     setMuted(!video.muted);
   });
-  tapHear.addEventListener("click", (e) => { e.stopPropagation(); setMuted(false); });
   stage.addEventListener("click", () => { if (state === "playing" && video.muted) setMuted(false); });
   // The visitor's first tap/click/keypress anywhere unlocks sound for the intro.
   const unlock = (e) => {
-    if (soundBtn.contains(e.target) || tapHear.contains(e.target)) return;
+    if (soundBtn.contains(e.target)) return;
     if (state === "playing" && video.muted && !userMuted) { video.muted = false; render(); }
   };
   ["pointerdown", "keydown", "touchend"].forEach((ev) => document.addEventListener(ev, unlock, { capture: true, passive: true }));

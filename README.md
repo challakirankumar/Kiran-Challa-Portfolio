@@ -103,4 +103,4 @@ To change any text, edit `html/index.html`: every section is clearly commented. 
 
 ## Credits
 
-Icons: [Lucide](https://lucide.dev) (ISC License). Fonts: Inter Tight, Instrument Serif and JetBrains Mono via Google Fonts.
+Icons: [Lucide](https://lucide.dev) (ISC). 3D emoji: [Microsoft Fluent Emoji](https://github.com/microsoft/fluentui-emoji) (MIT). Brand logos: [LobeHub Icons](https://github.com/lobehub/lobe-icons) and [Devicon](https://devicon.dev) (MIT). The logos are trademarks of their owners and are used only to name the tools. Fonts: Inter Tight, Instrument Serif and JetBrains Mono via Google Fonts.
