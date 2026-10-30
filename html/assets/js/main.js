@@ -6,6 +6,7 @@
   const $$ = (s, el = document) => [...el.querySelectorAll(s)];
   const root = document.documentElement;
   root.classList.add("js");
+  window.__kc = true;
 
   const reduceMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
   const finePointer = matchMedia("(hover: hover) and (pointer: fine)").matches;
@@ -208,7 +209,8 @@
     const d = tile.dataset;
     ins.idx.textContent = String(d.i).padStart(2, "0");
     ins.sym.textContent = d.sym;
-    ins.icon.setAttribute("href", "#i-" + d.icon);
+    ins.icon.setAttribute("href", "#" + d.icon);
+    ins.tile.style.setProperty("--c", d.color);
     ins.name.textContent = d.name;
     ins.meta.textContent = `${d.catname} · Symbol ${d.sym}`;
     const used = usage[d.name] || [];
@@ -340,63 +342,192 @@
     }, 1800);
   }));
 
-  /* ---------- Hero intro video ---------- */
-  // Plays muted on load (browser autoplay rules), offers sound, then cross-fades
-  // into the cut-out portrait. Pauses while the hero is off-screen.
-  const figure = $("#hero-figure");
+  /* ---------- Hero intro: scroll-triggered, background removed in real time ---------- */
+  // The intro is encoded as a "stacked alpha" video: colour in the top half, the
+  // person's matte in the bottom half. A tiny WebGL shader recombines them, so
+  // Kiran appears with no background on every browser (Safari included).
+  const hero = $("#top");
+  const pinEl = $("#hero-pin");
+  const stage = $("#hero-stage");
+  const canvas = $("#hero-canvas");
   const video = $("#intro-video");
   const soundBtn = $("#sound-btn");
-  const soundLabel = $("span", soundBtn);
-  const soundIcon = $("use", soundBtn);
-  const saveData = navigator.connection && navigator.connection.saveData;
+  const tapHear = $("#tap-hear");
+  const btnLabel = $("span", soundBtn);
+  const btnIcon = $("use", soundBtn);
+  const saveData = !!(navigator.connection && navigator.connection.saveData);
+  const pinned = matchMedia("(min-width: 1101px)");
+  const SOURCES = {
+    alpha: { mp4: "assets/video/kiran-intro-alpha.mp4", webm: "assets/video/kiran-intro-alpha.webm" },
+    plain: { mp4: "assets/video/kiran-intro.mp4", webm: "assets/video/kiran-intro.webm" },
+  };
+  const canMp4 = !!video.canPlayType('video/mp4; codecs="avc1.640028, mp4a.40.2"');
+  const pick = (set) => (canMp4 ? set.mp4 : set.webm);
 
-  const renderSound = () => {
-    const ended = figure.classList.contains("is-ended");
-    soundBtn.classList.toggle("is-replay", ended);
-    if (ended) {
-      soundLabel.textContent = "Replay intro";
-      soundIcon.setAttribute("href", "#i-rotate-ccw");
-      soundBtn.setAttribute("aria-pressed", "false");
-    } else {
-      soundLabel.textContent = video.muted ? "Sound on" : "Mute";
-      soundIcon.setAttribute("href", video.muted ? "#i-volume-x" : "#i-volume-2");
-      soundBtn.setAttribute("aria-pressed", String(!video.muted));
+  const createRenderer = (cv) => {
+    let g = null;
+    try { g = cv.getContext("webgl", { alpha: true, premultipliedAlpha: true, antialias: false }); } catch { /* no WebGL */ }
+    if (!g) return null;
+    const shader = (type, src) => {
+      const s = g.createShader(type);
+      g.shaderSource(s, src);
+      g.compileShader(s);
+      return s;
+    };
+    const prog = g.createProgram();
+    g.attachShader(prog, shader(g.VERTEX_SHADER,
+      "attribute vec2 p;varying vec2 uv;void main(){uv=vec2(p.x*.5+.5,.5-p.y*.5);gl_Position=vec4(p,0.,1.);}"));
+    g.attachShader(prog, shader(g.FRAGMENT_SHADER,
+      "precision mediump float;varying vec2 uv;uniform sampler2D t;" +
+      "void main(){vec3 c=texture2D(t,vec2(uv.x,uv.y*.4995)).rgb;float a=texture2D(t,vec2(uv.x,.5005+uv.y*.4995)).r;" +
+      "a=smoothstep(.04,.96,a);gl_FragColor=vec4(c*a,a);}"));
+    g.linkProgram(prog);
+    if (!g.getProgramParameter(prog, g.LINK_STATUS)) return null;
+    g.useProgram(prog);
+    const buf = g.createBuffer();
+    g.bindBuffer(g.ARRAY_BUFFER, buf);
+    g.bufferData(g.ARRAY_BUFFER, new Float32Array([-1, -1, 1, -1, -1, 1, 1, 1]), g.STATIC_DRAW);
+    const loc = g.getAttribLocation(prog, "p");
+    g.enableVertexAttribArray(loc);
+    g.vertexAttribPointer(loc, 2, g.FLOAT, false, 0, 0);
+    const tex = g.createTexture();
+    g.bindTexture(g.TEXTURE_2D, tex);
+    [[g.TEXTURE_WRAP_S, g.CLAMP_TO_EDGE], [g.TEXTURE_WRAP_T, g.CLAMP_TO_EDGE],
+     [g.TEXTURE_MIN_FILTER, g.LINEAR], [g.TEXTURE_MAG_FILTER, g.LINEAR]].forEach(([k, v]) => g.texParameteri(g.TEXTURE_2D, k, v));
+    g.clearColor(0, 0, 0, 0);
+    return {
+      draw() {
+        g.texImage2D(g.TEXTURE_2D, 0, g.RGB, g.RGB, g.UNSIGNED_BYTE, video); // throws if the video is cross-origin (e.g. file://)
+        g.viewport(0, 0, cv.width, cv.height);
+        g.clear(g.COLOR_BUFFER_BIT);
+        g.drawArrays(g.TRIANGLE_STRIP, 0, 4);
+      },
+    };
+  };
+
+  let renderer = createRenderer(canvas);
+  const useFallback = () => {
+    // No WebGL (or a blocked texture upload): play the original video, blended into the page.
+    renderer = null;
+    hero.classList.add("no-gl");
+    hero.classList.remove("has-frame");
+    const t = video.currentTime;
+    const wasPlaying = !video.paused;
+    video.src = pick(SOURCES.plain);
+    video.currentTime = t;
+    if (wasPlaying) video.play().catch(() => {});
+  };
+  if (renderer) video.src = pick(SOURCES.alpha);
+  else { hero.classList.add("no-gl"); video.src = pick(SOURCES.plain); }
+
+  const drawFrame = () => {
+    if (!renderer || video.readyState < 2) return;
+    try {
+      renderer.draw();
+      hero.classList.add("has-frame");
+    } catch {
+      useFallback();
     }
   };
-  const endIntro = () => { figure.classList.add("is-ended"); renderSound(); };
-  const playIntro = (withSound) => {
-    figure.classList.remove("is-ended");
-    if (video.ended || video.currentTime > video.duration - 0.2) video.currentTime = 0;
-    video.muted = !withSound;
-    video.play().catch(() => { video.muted = true; video.play().catch(endIntro); });
-    renderSound();
+  const frameLoop = () => {
+    drawFrame();
+    if (!video.paused && !video.ended) scheduleFrame();
+  };
+  const scheduleFrame = () => {
+    if (!renderer) return;
+    if (video.requestVideoFrameCallback) video.requestVideoFrameCallback(frameLoop);
+    else requestAnimationFrame(frameLoop);
+  };
+  video.addEventListener("play", scheduleFrame);
+  video.addEventListener("seeked", drawFrame);
+
+  let state = "idle";
+  let userMuted = false;
+  let autoStarted = false;
+
+  const render = () => {
+    hero.classList.toggle("is-playing", state === "playing");
+    hero.classList.toggle("is-ended", state === "ended");
+    hero.classList.toggle("is-muted", video.muted);
+    let label = "Mute", icon = "#i-volume-2";
+    if (state === "idle") { label = "Play intro"; icon = "#i-play"; }
+    else if (state === "ended") { label = "Replay intro"; icon = "#i-rotate-ccw"; }
+    else if (video.muted) { label = "Sound on"; icon = "#i-volume-x"; }
+    btnLabel.textContent = label;
+    btnIcon.setAttribute("href", icon);
+    soundBtn.setAttribute("aria-label", state === "playing" ? (video.muted ? "Turn sound on" : "Mute") : label);
   };
 
-  video.addEventListener("ended", endIntro);
-  video.addEventListener("error", endIntro, true);
-  video.addEventListener("timeupdate", () => {
-    if (video.duration) soundBtn.style.setProperty("--p", video.currentTime / video.duration);
-  });
-  soundBtn.addEventListener("click", () => {
-    if (figure.classList.contains("is-ended")) return playIntro(true);
-    if (video.paused) return playIntro(true);
-    video.muted = !video.muted;
-    renderSound();
-  });
+  const start = (withSound) => {
+    if (state === "playing" && !video.paused) return;
+    if (state === "ended" || video.ended) video.currentTime = 0;
+    video.preload = "auto";
+    state = "playing";
+    video.muted = !withSound;
+    render();
+    video.play().catch(() => {
+      // Browsers only allow sound after a tap/click/keypress — fall back to muted playback.
+      if (!video.muted) {
+        video.muted = true;
+        render();
+        video.play().catch(() => { state = "idle"; render(); });
+      } else { state = "idle"; render(); }
+    });
+  };
+  const setMuted = (muted) => {
+    video.muted = muted;
+    userMuted = muted;
+    render();
+  };
 
-  if (reduceMotion || saveData) {
-    video.removeAttribute("autoplay");
-    video.pause();
-    endIntro();
-  } else {
-    video.play().catch(endIntro); // autoplay blocked → show the portrait
-    new IntersectionObserver(([entry]) => {
-      if (figure.classList.contains("is-ended")) return;
-      if (entry.isIntersecting) video.play().catch(() => {});
-      else video.pause();
-    }, { threshold: 0.15 }).observe(figure);
-  }
-  renderSound();
+  video.addEventListener("ended", () => { state = "ended"; render(); });
+  video.addEventListener("timeupdate", () => {
+    if (video.duration) soundBtn.style.setProperty("--p", (video.currentTime / video.duration).toFixed(4));
+  });
+  video.addEventListener("volumechange", render);
+
+  soundBtn.addEventListener("click", () => {
+    if (state !== "playing") return start(true);
+    if (video.paused) { video.muted = false; video.play().catch(() => {}); return render(); }
+    setMuted(!video.muted);
+  });
+  tapHear.addEventListener("click", (e) => { e.stopPropagation(); setMuted(false); });
+  stage.addEventListener("click", () => { if (state === "playing" && video.muted) setMuted(false); });
+  // The visitor's first tap/click/keypress anywhere unlocks sound for the intro.
+  const unlock = (e) => {
+    if (soundBtn.contains(e.target) || tapHear.contains(e.target)) return;
+    if (state === "playing" && video.muted && !userMuted) { video.muted = false; render(); }
+  };
+  ["pointerdown", "keydown", "touchend"].forEach((ev) => document.addEventListener(ev, unlock, { capture: true, passive: true }));
+
+  // Trigger: the first scroll down (desktop, pinned hero) or Kiran scrolling into view (tablet/phone).
+  const autoPlayAllowed = !reduceMotion && !saveData;
+  const tryAutoStart = () => {
+    if (autoStarted || !autoPlayAllowed || state !== "idle") return;
+    autoStarted = true;
+    start(true);
+  };
+  window.addEventListener("scroll", () => {
+    if (autoStarted || window.scrollY < 8) return;
+    if (pinned.matches) {
+      if (pinEl.getBoundingClientRect().bottom > window.innerHeight * 0.6) tryAutoStart();
+    } else {
+      const r = stage.getBoundingClientRect();
+      const visible = Math.min(r.bottom, window.innerHeight) - Math.max(r.top, 0);
+      if (visible > r.height * 0.5) tryAutoStart();
+    }
+  }, { passive: true });
+
+  // Pause while Kiran is off-screen; resume when he's back.
+  new IntersectionObserver(([entry]) => {
+    if (state !== "playing") return;
+    if (entry.isIntersecting) video.play().catch(() => {});
+    else video.pause();
+  }, { threshold: 0.2 }).observe(stage);
+
+  // Warm the video up once the page has settled, so the intro starts instantly.
+  if (!saveData) window.addEventListener("load", () => setTimeout(() => { video.preload = "auto"; video.load(); }, 600));
+  render();
 
   /* ---------- Footer year ---------- */
   const year = $("#year");
