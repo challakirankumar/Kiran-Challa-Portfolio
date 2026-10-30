@@ -8,23 +8,6 @@
   Cross-Origin-Opener-Policy: same-origin
   Content-Security-Policy: default-src 'self'; script-src 'self' 'sha256-uL7NqPkWkXKmeYeiz4rp95cDOE3UQM8OZ07Obgd++KA='; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data:; media-src 'self'; connect-src 'self'; frame-ancestors 'none'; base-uri 'self'; form-action 'self' mailto:
 
-/
+# Everything revalidates on each visit (cheap 304s via ETag), so a new deploy shows up immediately.
+/*
   Cache-Control: public, max-age=0, must-revalidate
-
-/*.html
-  Cache-Control: public, max-age=0, must-revalidate
-
-/assets/css/*
-  Cache-Control: public, max-age=604800, stale-while-revalidate=86400
-
-/assets/js/*
-  Cache-Control: public, max-age=604800, stale-while-revalidate=86400
-
-/assets/img/*
-  Cache-Control: public, max-age=2592000, stale-while-revalidate=86400
-
-/assets/video/*
-  Cache-Control: public, max-age=2592000
-
-/assets/docs/*
-  Cache-Control: public, max-age=3600
