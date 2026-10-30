@@ -347,7 +347,6 @@
   // person's matte in the bottom half. A tiny WebGL shader recombines them, so
   // Kiran appears with no background on every browser (Safari included).
   const hero = $("#top");
-  const pinEl = $("#hero-pin");
   const stage = $("#hero-stage");
   const canvas = $("#hero-canvas");
   const video = $("#intro-video");
@@ -442,16 +441,19 @@
   video.addEventListener("seeked", drawFrame);
 
   let state = "idle";
+  let rolling = false;
   let userMuted = false;
   let autoStarted = false;
 
   const render = () => {
     hero.classList.toggle("is-playing", state === "playing");
+    // Copy fades only once frames are actually moving (not while the video is still buffering)
+    hero.classList.toggle("is-rolling", state === "playing" && rolling);
     hero.classList.toggle("is-ended", state === "ended");
     hero.classList.toggle("is-muted", video.muted);
     let label = "Mute", icon = "#i-volume-2";
-    if (state === "idle") { label = "Play intro"; icon = "#i-play"; }
-    else if (state === "ended") { label = "Replay intro"; icon = "#i-rotate-ccw"; }
+    if (state === "idle") { label = "Play"; icon = "#i-play"; }
+    else if (state === "ended") { label = "Replay"; icon = "#i-volume-2"; }
     else if (video.muted) { label = "Sound on"; icon = "#i-volume-x"; }
     btnLabel.textContent = label;
     btnIcon.setAttribute("href", icon);
@@ -480,7 +482,9 @@
     render();
   };
 
-  video.addEventListener("ended", () => { state = "ended"; render(); });
+  video.addEventListener("ended", () => { state = "ended"; rolling = false; render(); });
+  video.addEventListener("playing", () => { rolling = true; render(); });
+  video.addEventListener("waiting", () => { if (video.currentTime < 0.5) { rolling = false; render(); } });
   video.addEventListener("timeupdate", () => {
     if (video.duration) soundBtn.style.setProperty("--p", (video.currentTime / video.duration).toFixed(4));
   });
@@ -500,23 +504,32 @@
   };
   ["pointerdown", "keydown", "touchend"].forEach((ev) => document.addEventListener(ev, unlock, { capture: true, passive: true }));
 
-  // Trigger: the first scroll down (desktop, pinned hero) or Kiran scrolling into view (tablet/phone).
+  // Trigger: the intro plays as soon as the visitor arrives (desktop), or when Kiran
+  // scrolls into view on tablets/phones where he sits below the copy.
   const autoPlayAllowed = !reduceMotion && !saveData;
   const tryAutoStart = () => {
     if (autoStarted || !autoPlayAllowed || state !== "idle") return;
     autoStarted = true;
-    start(true);
+    start(true); // tries with sound; browsers that block it get muted playback + "Tap to hear"
   };
-  window.addEventListener("scroll", () => {
-    if (autoStarted || window.scrollY < 8) return;
-    if (pinned.matches) {
-      if (pinEl.getBoundingClientRect().bottom > window.innerHeight * 0.6) tryAutoStart();
-    } else {
-      const r = stage.getBoundingClientRect();
-      const visible = Math.min(r.bottom, window.innerHeight) - Math.max(r.top, 0);
-      if (visible > r.height * 0.5) tryAutoStart();
-    }
-  }, { passive: true });
+  if (pinned.matches) tryAutoStart();
+  new IntersectionObserver(([entry]) => {
+    if (entry.isIntersecting && entry.intersectionRatio >= 0.5) tryAutoStart();
+  }, { threshold: [0, 0.5, 1] }).observe(stage);
+  // Anything that counts as a gesture also starts it if autoplay was refused outright.
+  ["pointerdown", "keydown", "touchend"].forEach((ev) => document.addEventListener(ev, () => {
+    if (state === "idle" && autoPlayAllowed) start(true);
+  }, { once: true, passive: true }));
+
+  // As the visitor scrolls past the hero, Kiran fades out (desktop).
+  const fadeOnScroll = () => {
+    if (!pinned.matches) { stage.style.removeProperty("--fade"); return; }
+    const p = Math.min(1, Math.max(0, window.scrollY / (window.innerHeight * 0.75)));
+    stage.style.setProperty("--fade", (1 - p).toFixed(3));
+  };
+  window.addEventListener("scroll", fadeOnScroll, { passive: true });
+  window.addEventListener("resize", fadeOnScroll);
+  fadeOnScroll();
 
   // Pause while Kiran is off-screen; resume when he's back.
   new IntersectionObserver(([entry]) => {
@@ -525,8 +538,6 @@
     else video.pause();
   }, { threshold: 0.2 }).observe(stage);
 
-  // Warm the video up once the page has settled, so the intro starts instantly.
-  if (!saveData) window.addEventListener("load", () => setTimeout(() => { video.preload = "auto"; video.load(); }, 600));
   render();
 
   /* ---------- Footer year ---------- */

@@ -145,8 +145,8 @@
 
   <main id="main">
     <!-- ============ HERO ============ -->
-    <!-- The hero is pinned while the visitor scrolls: the first scroll starts the intro,
-         the copy steps aside, and Kiran walks forward and talks (background removed in real time). -->
+    <!-- Intro plays on arrival: the copy fades away while Kiran walks forward and talks
+         (background removed in real time), then the copy returns. -->
     <div class="hero-pin" id="hero-pin">
       <section class="hero" id="top" aria-label="Introduction">
         <div class="hero-word" aria-hidden="true">KIRAN</div>
@@ -161,7 +161,7 @@
             <img src="assets/img/kiran-portrait.png" width="768" height="1168" alt="" loading="lazy">
           </picture>
           <canvas class="hero-canvas" id="hero-canvas" width="768" height="1168" aria-hidden="true"></canvas>
-          <video class="hero-video" id="intro-video" playsinline preload="metadata" aria-label="Video introduction from Kiran Kumar Challa"></video>
+          <video class="hero-video" id="intro-video" playsinline muted preload="auto" aria-label="Video introduction from Kiran Kumar Challa"></video>
           <button class="tap-hear" id="tap-hear" type="button">
             <span class="tap-hear-icon"><svg class="icon"><use href="#i-volume-2"/></svg></span>
             <span>Tap to hear Kiran</span>
@@ -190,16 +190,14 @@
           </div>
 
           <ul class="hero-tags" aria-label="Highlights">
-            <li class="chip"><span class="dot" aria-hidden="true"></span>AI Developer</li>
+            <li class="chip">AI Developer</li>
             <li class="chip">5 AI modules shipped</li>
             <li class="chip">Founder product</li>
           </ul>
         </div>
 
-        <div class="scroll-hint" aria-hidden="true"><span class="mouse"><i></i></span><span>Scroll to meet Kiran</span></div>
-
-        <button class="btn btn--sm sound" type="button" id="sound-btn" aria-controls="intro-video">
-          <svg class="icon"><use href="#i-play"/></svg><span>Play intro</span><i class="sound-progress" aria-hidden="true"></i>
+        <button class="btn sound" type="button" id="sound-btn" aria-controls="intro-video">
+          <svg class="icon"><use href="#i-volume-2"/></svg><span>Mute</span><i class="sound-progress" aria-hidden="true"></i>
         </button>
       </section>
     </div>
