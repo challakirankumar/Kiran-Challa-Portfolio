@@ -493,29 +493,73 @@
     setMuted(!video.muted);
   });
   stage.addEventListener("click", () => { if (state === "playing" && video.muted) setMuted(false); });
-  // The visitor's first tap/click/keypress anywhere unlocks sound for the intro.
-  const unlock = (e) => {
-    if (soundBtn.contains(e.target)) return;
+  // The visitor's first tap/click/keypress anywhere turns the intro's sound on.
+  const unmuteOnGesture = (e) => {
+    if (soundBtn.contains(e.target) || skipBtn.contains(e.target)) return;
     if (state === "playing" && video.muted && !userMuted) { video.muted = false; render(); }
   };
-  ["pointerdown", "keydown", "touchend"].forEach((ev) => document.addEventListener(ev, unlock, { capture: true, passive: true }));
+  ["pointerdown", "keydown", "touchend"].forEach((ev) => document.addEventListener(ev, unmuteOnGesture, { capture: true, passive: true }));
 
-  // Trigger: the intro plays as soon as the visitor arrives (desktop), or when Kiran
-  // scrolls into view on tablets/phones where he sits below the copy.
+  // Trigger: the visitor's first scroll from the opening section starts the intro.
+  // While Kiran walks and talks, scrolling is held until his voice ends (or he's skipped).
   const autoPlayAllowed = !reduceMotion && !saveData;
-  const tryAutoStart = () => {
-    if (autoStarted || !autoPlayAllowed || state !== "idle") return;
-    autoStarted = true;
-    start(true); // tries with sound; browsers that block it get muted playback + "Tap to hear"
+  const skipBtn = $("#skip-intro");
+  let locked = false;
+  const SCROLL_KEYS = new Set(["ArrowDown", "ArrowUp", "PageDown", "PageUp", "Home", "End", " ", "Spacebar"]);
+  const blockWheel = (e) => { if (locked) e.preventDefault(); };
+  const blockKeys = (e) => { if (locked && SCROLL_KEYS.has(e.key) && !e.target.closest("button, a, input, textarea")) e.preventDefault(); };
+  [["wheel", blockWheel], ["touchmove", blockWheel]].forEach(([ev, fn]) => window.addEventListener(ev, fn, { passive: false }));
+  window.addEventListener("keydown", blockKeys);
+
+  const lock = () => {
+    locked = true;
+    root.classList.add("is-intro-locked");
+    hero.classList.add("is-locked");
+    // Keep Kiran fully in view while he talks.
+    const target = pinned.matches ? 0 : Math.max(0, stage.getBoundingClientRect().top + window.scrollY - (window.innerHeight - stage.offsetHeight) / 2);
+    window.scrollTo({ top: target, behavior: reduceMotion ? "auto" : "smooth" });
   };
-  if (pinned.matches) tryAutoStart();
+  const unlock = () => {
+    if (!locked) return;
+    locked = false;
+    root.classList.remove("is-intro-locked");
+    hero.classList.remove("is-locked");
+  };
+  video.addEventListener("ended", unlock);
+  video.addEventListener("error", unlock);
+
+  const begin = () => {
+    if (autoStarted || state !== "idle") return false;
+    autoStarted = true;
+    start(true); // with sound when the browser allows it; otherwise muted + "Tap to hear"
+    lock();
+    // Safety net: never hold the page longer than the clip (plus buffering grace).
+    setTimeout(unlock, 25000);
+    return true;
+  };
+  const skip = () => {
+    if (state === "playing") { video.pause(); video.currentTime = video.duration || 15; state = "ended"; rolling = false; render(); }
+    unlock();
+  };
+  skipBtn.addEventListener("click", skip);
+  $$('a[href^="#"]').forEach((a) => a.addEventListener("click", () => { if (locked) skip(); }));
+
+  // Desktop: the hero fills the screen, so any downward scroll intent starts the intro.
+  const atTop = () => window.scrollY < hero.offsetHeight * 0.35;
+  const onIntent = (e) => {
+    if (!autoPlayAllowed || autoStarted || !pinned.matches || !atTop()) return;
+    if (begin()) e.preventDefault();
+  };
+  window.addEventListener("wheel", (e) => { if (e.deltaY > 0) onIntent(e); }, { passive: false });
+  let touchY = null;
+  window.addEventListener("touchstart", (e) => { touchY = e.touches[0].clientY; }, { passive: true });
+  window.addEventListener("touchmove", (e) => { if (touchY !== null && touchY - e.touches[0].clientY > 8) onIntent(e); }, { passive: false });
+  window.addEventListener("keydown", (e) => { if (["ArrowDown", "PageDown", " ", "Spacebar", "End"].includes(e.key) && !e.target.closest("button, a, input, textarea")) onIntent(e); });
+
+  // Tablets/phones: Kiran sits below the copy, so the intro starts once he's scrolled into view.
   new IntersectionObserver(([entry]) => {
-    if (entry.isIntersecting && entry.intersectionRatio >= 0.5) tryAutoStart();
-  }, { threshold: [0, 0.5, 1] }).observe(stage);
-  // Anything that counts as a gesture also starts it if autoplay was refused outright.
-  ["pointerdown", "keydown", "touchend"].forEach((ev) => document.addEventListener(ev, () => {
-    if (state === "idle" && autoPlayAllowed) start(true);
-  }, { once: true, passive: true }));
+    if (!pinned.matches && autoPlayAllowed && entry.isIntersecting && entry.intersectionRatio >= 0.6) begin();
+  }, { threshold: [0, 0.6, 1] }).observe(stage);
 
   // As the visitor scrolls past the hero, Kiran fades out (desktop).
   const fadeOnScroll = () => {
@@ -535,6 +579,19 @@
   }, { threshold: 0.2 }).observe(stage);
 
   render();
+
+  /* ---------- Footer wordmark: orange spotlight follows the cursor ---------- */
+  const footer = $("#footer");
+  const wordmark = $(".wordmark", footer);
+  if (footer && wordmark && finePointer) {
+    footer.addEventListener("pointermove", (e) => {
+      const r = wordmark.getBoundingClientRect();
+      wordmark.style.setProperty("--mx", `${((e.clientX - r.left) / r.width) * 100}%`);
+      wordmark.style.setProperty("--my", `${((e.clientY - r.top) / r.height) * 100}%`);
+      footer.classList.add("is-hover");
+    });
+    footer.addEventListener("pointerleave", () => footer.classList.remove("is-hover"));
+  }
 
   /* ---------- Footer year ---------- */
   const year = $("#year");
