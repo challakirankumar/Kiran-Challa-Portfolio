@@ -92,10 +92,11 @@ Replace `YOUR-DOMAIN.com` in `html/robots.txt` and `html/sitemap.xml` with your 
 
 ### How the hero works
 
-- **On arrival (desktop):** the intro starts straight away. The headline, buttons and stats stay visible for a moment, then fade while Kiran walks forward and talks, and fade back when he finishes. As the visitor scrolls on, Kiran fades out.
-- **Tablet and phone:** the text comes first. The intro starts when Kiran scrolls into view, and the text stays visible.
-- **Sound:** browsers only allow sound after a visitor's first tap, click or keypress. If sound is blocked, the intro plays silently with a **Tap to hear Kiran** button. The corner button switches between Sound on, Mute and Replay.
-- **Respectful defaults:** the intro pauses when scrolled off-screen, and it never autoplays for visitors with *reduced motion* or *data saver* on. They get a Play button instead.
+- **First scroll starts the intro.** On arrival, Kiran stands in the hero with the headline beside him and a "Scroll to meet Kiran" hint. The visitor's first scroll, swipe or ↓/Space key starts the intro: he walks forward and speaks (voice: `Isolated.mp3`, mixed into the intro videos).
+- **The page waits for him.** While he talks, scrolling is held at the hero. It releases as soon as his voice ends, or immediately if the visitor presses **Skip intro** or a nav link. A 25-second safety timer always releases it.
+- **Tablet and phone:** the intro starts when Kiran scrolls into view, with the same hold-and-release behaviour.
+- **Sound:** browsers allow sound after a scroll-wheel, key press or tap. If a browser still blocks it, the intro plays muted and the corner button reads **Tap to hear**.
+- **Respectful defaults:** visitors with *reduced motion* or *data saver* on are never held. They get a Play button instead.
 
 To replace the intro with a new clip, the stacked-alpha file has to be regenerated (person segmentation for each frame, with colour stacked above the mask). Ask Claude to do this from the new MP4.
 
