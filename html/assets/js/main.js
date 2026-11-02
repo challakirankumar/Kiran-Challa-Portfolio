@@ -48,6 +48,24 @@
     walk(el);
   });
 
+  /* ---------- Preloader → cinematic hero entrance ---------- */
+  // Waits for fonts and the opening still (max ~2s), shows the monogram for a beat,
+  // then lifts away; html.is-loaded lets the hero choreograph in.
+  const preloader = $("#preloader");
+  const firstStill = $(".hero-still--start img");
+  const minShow = new Promise((r) => setTimeout(r, reduceMotion ? 0 : 900));
+  const ready = Promise.race([
+    Promise.all([
+      document.fonts ? document.fonts.ready : Promise.resolve(),
+      firstStill && firstStill.decode ? firstStill.decode().catch(() => {}) : Promise.resolve(),
+    ]),
+    new Promise((r) => setTimeout(r, 2200)),
+  ]);
+  Promise.all([ready, minShow]).then(() => {
+    root.classList.add("is-loaded");
+    if (preloader) setTimeout(() => preloader.remove(), 1200);
+  });
+
   /* ---------- Reveal on scroll ---------- */
   const revealIO = new IntersectionObserver((entries) => {
     entries.forEach((e) => {
@@ -562,10 +580,13 @@
   }, { threshold: [0, 0.6, 1] }).observe(stage);
 
   // As the visitor scrolls past the hero, Kiran fades out (desktop).
+  // Hero → About transition: as the page scrolls on, the hero recedes (copy lifts and
+  // fades, Kiran sinks back, the wordmark swells) while About rises over it as a sheet.
   const fadeOnScroll = () => {
-    if (!pinned.matches) { stage.style.removeProperty("--fade"); return; }
-    const p = Math.min(1, Math.max(0, window.scrollY / (window.innerHeight * 0.75)));
-    stage.style.setProperty("--fade", (1 - p).toFixed(3));
+    if (!pinned.matches) { stage.style.removeProperty("--fade"); hero.style.removeProperty("--hp"); return; }
+    const p = Math.min(1, Math.max(0, window.scrollY / (window.innerHeight * 0.8)));
+    hero.style.setProperty("--hp", p.toFixed(4));
+    stage.style.setProperty("--fade", (1 - p * 0.9).toFixed(3));
   };
   window.addEventListener("scroll", fadeOnScroll, { passive: true });
   window.addEventListener("resize", fadeOnScroll);
