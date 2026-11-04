@@ -604,6 +604,7 @@
       const r = wordmark.getBoundingClientRect();
       const p = Math.min(1, Math.max(0, (window.innerHeight - r.top - 40) / (r.height + 60)));
       wordmark.style.setProperty("--fill", reduceMotion ? 1 : p.toFixed(4));
+      if (p > 0.05) wordmark.parentElement.classList.add("wm-in");
     };
     window.addEventListener("scroll", () => requestAnimationFrame(fill), { passive: true });
     window.addEventListener("resize", fill);
