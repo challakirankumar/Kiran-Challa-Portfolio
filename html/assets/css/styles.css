@@ -1764,3 +1764,35 @@ html.is-intro-locked, html.is-intro-locked body { overflow: hidden; overscroll-b
 .badge-rows div { padding: 7px 2px; }
 .badge-foot { padding-top: 8px; }
 .badge-qr svg { width: 50px; height: 50px; }
+
+/* ==========================================================================
+   v7 — Enter gate (unlocks sound), pinned Achievements, ID card without chip
+   ========================================================================== */
+.pl-enter, .pl-quiet { opacity: 0; transform: translateY(10px); pointer-events: none; transition: opacity .6s var(--ease), transform .6s var(--ease); }
+.js.is-ready .pl-enter, .js.is-ready .pl-quiet { opacity: 1; transform: none; pointer-events: auto; }
+.js.is-ready .pl-quiet { transition-delay: .12s; }
+.pl-enter { margin-top: 18px; --h: 52px; padding: 0 28px; font-size: 15px; }
+.pl-enter .icon { width: 17px; height: 17px; }
+.pl-quiet { font-size: 12px; font-weight: 600; letter-spacing: .06em; color: var(--muted); text-decoration: underline; text-underline-offset: 4px; padding: 6px 10px; }
+.pl-quiet:hover { color: var(--accent-deep); }
+.js .preloader:not(.x) { pointer-events: auto; }
+.js.is-loaded .preloader { pointer-events: none; }
+
+/* Achievements pinned: the container sticks while cards glide horizontally */
+#achievements.is-pinned { padding: 0; }
+#achievements.is-pinned .ach-pin {
+  position: sticky; top: 0; height: 100vh; height: 100svh;
+  display: flex; flex-direction: column; justify-content: center;
+  padding-top: calc(var(--nav-h) + 8px);
+}
+#achievements.is-pinned .section-head { margin-bottom: clamp(16px, 3vh, 40px); }
+#achievements.is-pinned .ach-track { overflow-x: hidden; scroll-snap-type: none; cursor: default; scroll-behavior: auto; padding-top: 14px; padding-bottom: clamp(20px, 4vh, 48px); }
+#achievements.is-pinned .ach { min-height: clamp(300px, 52vh, 440px); }
+#achievements.is-pinned .ach-num { padding-top: clamp(16px, 4vh, 40px); font-size: clamp(72px, min(9vw, 13vh), 140px); }
+@media (max-width: 860px) {
+  #achievements.is-pinned .ach { flex-basis: 82vw; }
+}
+
+/* ID card footer: QR on the right, no chip */
+.badge-foot { justify-content: flex-end; }
+html.js:not(.is-loaded), html.js:not(.is-loaded) body { overflow: hidden; }

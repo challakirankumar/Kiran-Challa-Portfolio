@@ -61,10 +61,32 @@
     ]),
     new Promise((r) => setTimeout(r, 1600)),
   ]);
-  Promise.all([ready, minShow]).then(() => {
+  // Browsers only allow sound after a click/tap/key press — a scroll doesn't count. So once
+  // everything is ready the loader offers "Enter with sound": that click unlocks audio for
+  // the whole visit, and the scroll-triggered intro then plays with Kiran's voice.
+  const enterBtn = $("#pl-enter");
+  const quietBtn = $("#pl-quiet");
+  const introVideo = $("#intro-video");
+  window.__kcSound = false;
+  const enter = (withSound) => {
+    if (root.classList.contains("is-loaded")) return;
+    window.__kcSound = withSound;
+    if (withSound && introVideo) {
+      // Prime the element inside the gesture (needed by iOS Safari), then rewind silently.
+      introVideo.muted = true;
+      const p = introVideo.play();
+      if (p) p.then(() => { introVideo.pause(); introVideo.currentTime = 0; }).catch(() => {});
+    }
     root.classList.add("is-loaded");
     if (preloader) setTimeout(() => preloader.remove(), 1200);
+  };
+  Promise.all([ready, minShow]).then(() => {
+    if (reduceMotion || !enterBtn) return enter(false);
+    root.classList.add("is-ready");
+    enterBtn.focus({ preventScroll: true });
   });
+  if (enterBtn) enterBtn.addEventListener("click", () => enter(true));
+  if (quietBtn) quietBtn.addEventListener("click", () => enter(false));
 
   /* ---------- Reveal on scroll ---------- */
   const revealIO = new IntersectionObserver((entries) => {
@@ -302,40 +324,41 @@
     });
   }
 
-  /* ---------- Achievements: drag-to-scroll + progress ---------- */
+  /* ---------- Achievements: vertical scroll drives the cards sideways ---------- */
+  // The section pins in place; scrolling down glides the cards from "Schools engaged" to
+  // "And counting", and only then does the page continue to Contact.
+  const achSection = $("#achievements");
   const track = $("#ach-track");
   const achBar = $(".ach-progress i");
-  const updateAch = () => {
-    const max = track.scrollWidth - track.clientWidth;
-    const p = max > 0 ? track.scrollLeft / max : 1;
+  let achDist = 0;
+  const achPinned = () => !reduceMotion;
+  const layoutAch = () => {
+    if (!achPinned()) { achSection.style.removeProperty("height"); achSection.classList.remove("is-pinned"); return; }
+    achSection.classList.add("is-pinned");
+    track.scrollLeft = 0;
+    achDist = Math.max(0, track.scrollWidth - track.clientWidth);
+    achSection.style.height = `${window.innerHeight + achDist * 1.15}px`;
+    driveAch();
+  };
+  const driveAch = () => {
+    if (!achPinned()) return;
+    const top = achSection.getBoundingClientRect().top;
+    const run = achSection.offsetHeight - window.innerHeight;
+    const p = run > 0 ? Math.min(1, Math.max(0, -top / run)) : 0;
+    track.scrollLeft = p * achDist;
     achBar.style.setProperty("--p", 0.2 + p * 0.8);
   };
-  track.addEventListener("scroll", updateAch, { passive: true });
-  updateAch();
-  if (finePointer) {
-    let down = false, startX = 0, startLeft = 0, moved = false;
-    track.addEventListener("pointerdown", (e) => {
-      if (e.pointerType !== "mouse") return;
-      down = true; moved = false; startX = e.clientX; startLeft = track.scrollLeft;
-      track.classList.add("is-drag");
-    });
-    window.addEventListener("pointermove", (e) => {
-      if (!down) return;
-      const dx = e.clientX - startX;
-      if (Math.abs(dx) > 3) moved = true;
-      track.scrollLeft = startLeft - dx;
-    });
-    window.addEventListener("pointerup", () => {
-      if (!down) return;
-      down = false;
-      track.classList.remove("is-drag");
-    });
-    track.addEventListener("click", (e) => { if (moved) { e.preventDefault(); e.stopPropagation(); } }, true);
+  window.addEventListener("scroll", () => requestAnimationFrame(driveAch), { passive: true });
+  window.addEventListener("resize", layoutAch);
+  window.addEventListener("load", layoutAch);
+  if (document.fonts) document.fonts.ready.then(layoutAch);
+  layoutAch();
+  if (!achPinned()) {
+    track.addEventListener("scroll", () => {
+      const max = track.scrollWidth - track.clientWidth;
+      achBar.style.setProperty("--p", 0.2 + (max > 0 ? track.scrollLeft / max : 1) * 0.8);
+    }, { passive: true });
   }
-  track.addEventListener("keydown", (e) => {
-    if (e.key === "ArrowRight") track.scrollBy({ left: 320, behavior: "smooth" });
-    if (e.key === "ArrowLeft") track.scrollBy({ left: -320, behavior: "smooth" });
-  });
 
   /* ---------- Copy email ---------- */
   $$("[data-copy]").forEach((btn) => btn.addEventListener("click", async () => {
@@ -484,6 +507,7 @@
     if (state === "playing" && !video.paused) return;
     if (state === "ended" || video.ended) video.currentTime = 0;
     video.preload = "auto";
+    rolling = false;
     state = "playing";
     video.muted = !withSound;
     render();
@@ -552,9 +576,9 @@
   video.addEventListener("error", unlock);
 
   const begin = () => {
-    if (autoStarted || state !== "idle") return false;
+    if (autoStarted || state !== "idle" || !root.classList.contains("is-loaded")) return false;
     autoStarted = true;
-    start(true); // with sound when the browser allows it; otherwise muted + "Tap to hear"
+    start(window.__kcSound !== false); // sound if the visitor entered with sound; otherwise muted + "Tap to hear"
     lock();
     // Safety net: never hold the page longer than the clip (plus buffering grace).
     setTimeout(unlock, 25000);

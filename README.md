@@ -26,7 +26,7 @@ A premium, single-page personal portfolio built with plain **HTML, CSS and JavaS
 3. **Skills:** a "periodic table" of 33 skills with colour-coded icons (brand marks for Claude, Gemini, ElevenLabs, NotebookLM, Kubernetes and CI/CD), category filters, and a live inspector that shows which projects use each skill.
 4. **Work:** the LearnX flagship card plus an expanding accordion of 9 projects. Each project has its own animated example UI.
 5. **Experience:** a scroll-driven timeline from education to the current role, including the founder track and key contributions from the resume.
-6. **Achievements:** a drag-to-scroll carousel with count-up numbers.
+6. **Achievements:** the section pins in place while scrolling down glides the cards sideways, from "Schools engaged" to "And counting". Then the page continues to Contact.
 7. **Contact:** the email address with a copy button, phone numbers, social links, and a rotating "Say hello" button.
 
 The site is responsive from phone to widescreen, works with keyboard navigation, and respects the "reduce motion" accessibility setting. It also includes SEO metadata, Open Graph social cards and JSON-LD structured data.
@@ -95,7 +95,7 @@ Replace `YOUR-DOMAIN.com` in `html/robots.txt` and `html/sitemap.xml` with your 
 - **First scroll starts the intro.** On arrival, Kiran stands in the hero with the headline beside him and a "Scroll to meet Kiran" hint. The visitor's first scroll, swipe or ↓/Space key starts the intro: he walks forward and speaks (voice: `Isolated.mp3`, mixed into the intro videos).
 - **The page waits for him.** While he talks, scrolling is held at the hero. It releases as soon as his voice ends, or immediately if the visitor presses **Skip intro** or a nav link. A 25-second safety timer always releases it.
 - **Tablet and phone:** the intro starts when Kiran scrolls into view, with the same hold-and-release behaviour.
-- **Sound:** browsers allow sound after a scroll-wheel, key press or tap. If a browser still blocks it, the intro plays muted and the corner button reads **Tap to hear**.
+- **Sound:** browsers never allow sound from a scroll alone; it needs a click, tap or key press. So the loading screen ends with **Enter with sound** (or *Enter without sound*). That one click unlocks audio for the visit, and the scroll-triggered intro then plays Kiran's voice, which is lip-synced to the video. If sound is still blocked, the corner button reads **Tap to hear**.
 - **Respectful defaults:** visitors with *reduced motion* or *data saver* on are never held. They get a Play button instead.
 
 To replace the intro with a new clip, the stacked-alpha file has to be regenerated (person segmentation for each frame, with colour stacked above the mask). Ask Claude to do this from the new MP4.
