@@ -1678,3 +1678,89 @@ html.is-intro-locked, html.is-intro-locked body { overflow: hidden; overscroll-b
 .badge-seal, .badge-seal .icon { animation: none; }
 .badge-seal::before { content: ""; position: absolute; inset: 3px; border-radius: 50%; background: radial-gradient(circle at 35% 30%, #fff 0%, #fff6ea 60%, #ffe2bf 100%); box-shadow: inset 0 1px 2px rgba(150,70,0,.25); }
 .badge-seal .icon { position: relative; stroke: var(--accent-deep); }
+
+/* ==========================================================================
+   v6 — Luxury "black card" ID: deep navy, brushed texture, gold foil
+   ========================================================================== */
+:root {
+  --gold-1: #f9e2a8; --gold-2: #e3b65e; --gold-3: #b8862f; --gold-4: #fff3cf;
+  --gold-foil: linear-gradient(135deg, #f9e2a8 0%, #d9a648 28%, #fff1c9 50%, #b98630 72%, #f2d18a 100%);
+}
+.badge { width: min(100%, 304px); aspect-ratio: 304 / 470; }
+.badge-face {
+  border-radius: 22px; color: #e9eef6;
+  background:
+    radial-gradient(120% 70% at 20% 0%, rgba(255,255,255,.10), transparent 55%),
+    repeating-linear-gradient(100deg, rgba(255,255,255,.018) 0 1px, transparent 1px 3px),
+    linear-gradient(160deg, #1b2c47 0%, #0f1d33 48%, #08111f 100%);
+  border: 1px solid rgba(227,182,94,.38);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.14), inset 0 0 0 5px rgba(8,17,31,.6), inset 0 0 0 6px rgba(227,182,94,.28),
+    0 2px 4px rgba(12,26,46,.2), 0 60px 90px -40px rgba(12,26,46,.75);
+}
+.badge-face::before { background: linear-gradient(180deg, rgba(255,255,255,.08) 0%, transparent 30%); }
+.badge-face::after { top: 0; background: linear-gradient(115deg, transparent 35%, rgba(255,236,190,.22) 48%, transparent 60%); }
+.badge-holo { opacity: .22; mix-blend-mode: screen; }
+.badge-slot { top: 14px; width: 46px; height: 8px; background: linear-gradient(180deg, #050b15, #111f35); box-shadow: inset 0 2px 3px rgba(0,0,0,.8), 0 1px 0 rgba(227,182,94,.35); }
+/* Header: replace the busy marquee with a quiet crest */
+.badge-strip { display: none; }
+.badge-body { padding: 34px 22px 18px; }
+.badge-crest { width: 100%; display: flex; align-items: center; gap: 10px; padding-bottom: 14px; margin-bottom: 16px; border-bottom: 1px solid transparent;
+  border-image: linear-gradient(90deg, transparent, rgba(227,182,94,.7), transparent) 1; }
+.crest-mark {
+  display: grid; place-items: center; width: 34px; height: 34px; border-radius: 50%; flex: none;
+  font-family: var(--font-display); font-size: 16px; letter-spacing: .04em; color: #1a1206;
+  background: var(--gold-foil); box-shadow: inset 0 1px 0 rgba(255,255,255,.7), inset 0 -2px 2px rgba(110,70,10,.35), 0 0 0 1px rgba(0,0,0,.4), 0 4px 10px -4px rgba(0,0,0,.6);
+}
+.crest-text { text-align: left; font-size: 8px; line-height: 1.5; letter-spacing: .28em; text-transform: uppercase; color: rgba(249,226,168,.75); font-weight: 700; }
+.crest-text b { color: #fff; letter-spacing: .2em; font-weight: 700; }
+/* Photo: thin gold-foil rim, seal in gold */
+.photo-frame { margin-top: 0; }
+.badge-photo { width: 112px; padding: 2px; border-radius: 14px; background: var(--gold-foil); box-shadow: 0 18px 30px -14px rgba(0,0,0,.8), 0 0 0 1px rgba(0,0,0,.5); }
+.badge-photo img { border: 0; box-shadow: none; border-radius: 12px; }
+.badge-seal { right: -10px; bottom: -8px; width: 28px; height: 28px; background: var(--gold-foil); box-shadow: 0 0 0 2px #0f1d33, 0 6px 12px -4px rgba(0,0,0,.7); }
+.badge-seal::before { display: none; }
+.badge-seal .icon { stroke: #2a1c05; stroke-width: 2.8; }
+/* Type */
+.badge-name { margin-top: 16px; font-size: 27px; letter-spacing: .07em; color: #fff; text-shadow: 0 1px 0 rgba(0,0,0,.4); }
+.badge-role { margin-top: 6px; font-size: 8.5px; letter-spacing: .2em; line-height: 1.6; color: var(--gold-2); }
+.badge-rows { margin-top: 16px; gap: 0; border-top: 1px solid rgba(255,255,255,.08); }
+.badge-rows div { padding: 9px 2px; border: 0; border-bottom: 1px solid rgba(255,255,255,.08); border-radius: 0; background: none; box-shadow: none; }
+.badge-rows dt { color: rgba(249,226,168,.6); }
+.badge-rows dd { color: #fff; font-weight: 600; }
+.badge-rows dd.mono { color: var(--gold-1); }
+/* Footer: gold chip + QR on a white tile */
+.badge-chip { background: var(--gold-foil); margin-bottom: 12px; box-shadow: inset 0 1px 0 rgba(255,255,255,.75), inset 0 -1px 1px rgba(110,70,10,.45), 0 3px 6px rgba(0,0,0,.5); }
+.badge-qr svg { background: #fff; box-shadow: 0 0 0 1px rgba(227,182,94,.5), 0 6px 14px -6px rgba(0,0,0,.7); }
+.badge-qr small { color: rgba(249,226,168,.65); }
+/* Back face */
+.badge-back .badge-body { padding-top: 34px; }
+.back-head { padding-bottom: 12px; border-bottom: 1px solid transparent; border-image: linear-gradient(90deg, rgba(227,182,94,.7), transparent) 1; }
+.back-head h4 { color: #fff; }
+.verified { background: var(--gold-foil); border: 0; color: #2a1c05; text-shadow: none; box-shadow: inset 0 1px 0 rgba(255,255,255,.7), 0 3px 8px -3px rgba(0,0,0,.6); }
+.back-list dt { color: var(--gold-2); }
+.back-list dd { color: rgba(233,238,246,.9); }
+.back-list div { border-bottom-color: rgba(255,255,255,.08); }
+.back-foot { border-top-color: rgba(255,255,255,.08); }
+.signature { color: var(--gold-1); }
+.back-foot small { color: rgba(233,238,246,.6); }
+/* Lanyard + clip in brushed gold */
+.lanyard {
+  background:
+    linear-gradient(90deg, transparent 2px, rgba(227,182,94,.9) 2px 3px, transparent 3px calc(100% - 3px), rgba(227,182,94,.9) calc(100% - 3px) calc(100% - 2px), transparent calc(100% - 2px)),
+    repeating-linear-gradient(0deg, rgba(255,255,255,.03) 0 1px, transparent 1px 3px),
+    linear-gradient(90deg, #070e1a 0%, #16263f 50%, #070e1a 100%);
+}
+.lanyard span { color: rgba(249,226,168,.75); }
+.clip { background: linear-gradient(90deg, #8a6424 0%, #f6dc9c 28%, #c39340 52%, #fbe8b7 74%, #8a6424 100%); }
+.badge-hint { color: var(--muted); }
+/* fit: everything inside the card */
+.badge { aspect-ratio: 304 / 496; }
+.badge-front .badge-body { padding: 30px 20px 16px; }
+.badge-crest { padding-bottom: 11px; margin-bottom: 13px; }
+.badge-photo { width: 104px; }
+.badge-name { margin-top: 13px; font-size: 25px; }
+.badge-rows { margin-top: 12px; }
+.badge-rows div { padding: 7px 2px; }
+.badge-foot { padding-top: 8px; }
+.badge-qr svg { width: 50px; height: 50px; }
