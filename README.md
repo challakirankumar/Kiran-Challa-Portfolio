@@ -95,7 +95,7 @@ Replace `YOUR-DOMAIN.com` in `html/robots.txt` and `html/sitemap.xml` with your 
 - **First scroll starts the intro.** On arrival, Kiran stands in the hero with the headline beside him and a "Scroll to meet Kiran" hint. The visitor's first scroll, swipe or ↓/Space key starts the intro: he walks forward and speaks (voice: `Isolated.mp3`, mixed into the intro videos).
 - **The page waits for him.** While he talks, scrolling is held at the hero. It releases as soon as his voice ends, or immediately if the visitor presses **Skip intro** or a nav link. A 25-second safety timer always releases it.
 - **Tablet and phone:** the intro starts when Kiran scrolls into view, with the same hold-and-release behaviour.
-- **Sound:** browsers never allow sound from a scroll alone; it needs a click, tap or key press. So the loading screen ends with **Enter with sound** (or *Enter without sound*). That one click unlocks audio for the visit, and the scroll-triggered intro then plays Kiran's voice, which is lip-synced to the video. If sound is still blocked, the corner button reads **Tap to hear**.
+- **Sound:** the intro tries to play with Kiran's voice (lip-synced to the video). Browsers only allow sound after a visitor's click, tap or key press, so where sound is blocked the intro plays muted and the first click or tap anywhere turns the voice on. The corner button reads **Tap to hear** until then.
 - **Respectful defaults:** visitors with *reduced motion* or *data saver* on are never held. They get a Play button instead.
 
 To replace the intro with a new clip, the stacked-alpha file has to be regenerated (person segmentation for each frame, with colour stacked above the mask). Ask Claude to do this from the new MP4.

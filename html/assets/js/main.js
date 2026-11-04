@@ -48,45 +48,12 @@
     walk(el);
   });
 
-  /* ---------- Preloader → cinematic hero entrance ---------- */
-  // Waits for fonts and the opening still (max ~2s), shows the monogram for a beat,
-  // then lifts away; html.is-loaded lets the hero choreograph in.
-  const preloader = $("#preloader");
-  const firstStill = $(".hero-still--start img");
-  const minShow = new Promise((r) => setTimeout(r, reduceMotion ? 0 : 700));
-  const ready = Promise.race([
-    Promise.all([
-      document.fonts ? document.fonts.ready : Promise.resolve(),
-      firstStill && firstStill.decode ? firstStill.decode().catch(() => {}) : Promise.resolve(),
-    ]),
-    new Promise((r) => setTimeout(r, 1600)),
-  ]);
-  // Browsers only allow sound after a click/tap/key press — a scroll doesn't count. So once
-  // everything is ready the loader offers "Enter with sound": that click unlocks audio for
-  // the whole visit, and the scroll-triggered intro then plays with Kiran's voice.
-  const enterBtn = $("#pl-enter");
-  const quietBtn = $("#pl-quiet");
-  const introVideo = $("#intro-video");
-  window.__kcSound = false;
-  const enter = (withSound) => {
-    if (root.classList.contains("is-loaded")) return;
-    window.__kcSound = withSound;
-    if (withSound && introVideo) {
-      // Prime the element inside the gesture (needed by iOS Safari), then rewind silently.
-      introVideo.muted = true;
-      const p = introVideo.play();
-      if (p) p.then(() => { introVideo.pause(); introVideo.currentTime = 0; }).catch(() => {});
-    }
-    root.classList.add("is-loaded");
-    if (preloader) setTimeout(() => preloader.remove(), 1200);
-  };
-  Promise.all([ready, minShow]).then(() => {
-    if (reduceMotion || !enterBtn) return enter(false);
-    root.classList.add("is-ready");
-    enterBtn.focus({ preventScroll: true });
-  });
-  if (enterBtn) enterBtn.addEventListener("click", () => enter(true));
-  if (quietBtn) quietBtn.addEventListener("click", () => enter(false));
+  /* ---------- Hero entrance ---------- */
+  // The main page shows straight away; html.is-loaded lets the hero choreograph in.
+  // The intro tries to play with sound; where the browser blocks it, it plays muted and
+  // the visitor's first click/tap/key press anywhere turns Kiran's voice on.
+  window.__kcSound = true;
+  requestAnimationFrame(() => root.classList.add("is-loaded"));
 
   /* ---------- Reveal on scroll ---------- */
   const revealIO = new IntersectionObserver((entries) => {
@@ -630,17 +597,17 @@
 
   render();
 
-  /* ---------- Footer wordmark: orange spotlight follows the cursor ---------- */
-  const footer = $("#footer");
-  const wordmark = $(".wordmark", footer);
-  if (footer && wordmark && finePointer) {
-    footer.addEventListener("pointermove", (e) => {
+  /* ---------- Footer wordmark: gold rises into the letters as the footer scrolls in ---------- */
+  const wordmark = $("#footer .wordmark");
+  if (wordmark) {
+    const fill = () => {
       const r = wordmark.getBoundingClientRect();
-      wordmark.style.setProperty("--mx", `${((e.clientX - r.left) / r.width) * 100}%`);
-      wordmark.style.setProperty("--my", `${((e.clientY - r.top) / r.height) * 100}%`);
-      footer.classList.add("is-hover");
-    });
-    footer.addEventListener("pointerleave", () => footer.classList.remove("is-hover"));
+      const p = Math.min(1, Math.max(0, (window.innerHeight - r.top - 40) / (r.height + 60)));
+      wordmark.style.setProperty("--fill", reduceMotion ? 1 : p.toFixed(4));
+    };
+    window.addEventListener("scroll", () => requestAnimationFrame(fill), { passive: true });
+    window.addEventListener("resize", fill);
+    fill();
   }
 
   /* ---------- Footer year ---------- */

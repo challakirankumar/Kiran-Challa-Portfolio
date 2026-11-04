@@ -1796,3 +1796,44 @@ html.is-intro-locked, html.is-intro-locked body { overflow: hidden; overscroll-b
 /* ID card footer: QR on the right, no chip */
 .badge-foot { justify-content: flex-end; }
 html.js:not(.is-loaded), html.js:not(.is-loaded) body { overflow: hidden; }
+
+/* ==========================================================================
+   v8 — No loader; footer wordmark in engraved gold
+   ========================================================================== */
+html.js:not(.is-loaded), html.js:not(.is-loaded) body { overflow: visible; }
+/* Engraved gold wordmark: a fine gold outline, solid brushed-gold fill that rises
+   into the letters as the footer scrolls in, a slow satin sheen, and a mirror reflection. */
+.wordmark { --fill: 0; -webkit-mask-image: none; mask-image: none; padding-bottom: 0; }
+.wm-glow { display: none; }
+.wm-base {
+  background: none; color: transparent;
+  -webkit-text-stroke: 1px rgba(227,182,94,.35);
+}
+.wm-gold, .wm-reflect {
+  position: absolute; left: 0; right: 0; top: clamp(24px, 4vw, 56px); display: block;
+  color: transparent; -webkit-background-clip: text; background-clip: text;
+  background-image:
+    linear-gradient(100deg, transparent 0 42%, rgba(255,250,235,.55) 50%, transparent 58% 100%),
+    linear-gradient(180deg, #fff1c9 0%, #f2cf86 22%, #d9a648 46%, #a8752a 62%, #e9c27a 82%, #f7dfa6 100%);
+  background-size: 250% 100%, 100% 100%;
+  background-position: 120% 0, 0 0;
+}
+.wm-gold {
+  clip-path: inset(calc((1 - var(--fill)) * 100%) 0 0 0);
+  animation: satin 7s ease-in-out infinite;
+}
+@keyframes satin { 0%, 55% { background-position: 120% 0, 0 0; } 100% { background-position: -30% 0, 0 0; } }
+.wm-reflect {
+  top: auto; bottom: 0; transform: translateY(96%) scaleY(-1); transform-origin: 50% 0;
+  opacity: calc(var(--fill) * .32);
+  -webkit-mask-image: linear-gradient(0deg, rgba(0,0,0,.9) 0%, transparent 45%);
+  mask-image: linear-gradient(0deg, rgba(0,0,0,.9) 0%, transparent 45%);
+  animation: none; pointer-events: none;
+}
+.footer .wordmark { margin-bottom: clamp(30px, 6vw, 90px); }
+.footer-bar { border-top-color: transparent; border-image: linear-gradient(90deg, transparent, rgba(227,182,94,.45), transparent) 1; }
+@media (prefers-reduced-motion: reduce) { .wm-gold { animation: none; } }
+.wordmark::after { content: ""; position: absolute; left: 10%; right: 10%; bottom: -6%; height: 40%; pointer-events: none;
+  background: radial-gradient(50% 60% at 50% 100%, rgba(227,182,94,calc(var(--fill) * .16)), transparent 70%); }
+.wm-reflect { display: none; }
+.wordmark::after { bottom: -14%; height: 46%; filter: blur(18px); background: radial-gradient(50% 50% at 50% 50%, rgba(227,182,94,calc(var(--fill) * .14)), transparent 70%); }
