@@ -53,13 +53,13 @@
   // then lifts away; html.is-loaded lets the hero choreograph in.
   const preloader = $("#preloader");
   const firstStill = $(".hero-still--start img");
-  const minShow = new Promise((r) => setTimeout(r, reduceMotion ? 0 : 900));
+  const minShow = new Promise((r) => setTimeout(r, reduceMotion ? 0 : 700));
   const ready = Promise.race([
     Promise.all([
       document.fonts ? document.fonts.ready : Promise.resolve(),
       firstStill && firstStill.decode ? firstStill.decode().catch(() => {}) : Promise.resolve(),
     ]),
-    new Promise((r) => setTimeout(r, 2200)),
+    new Promise((r) => setTimeout(r, 1600)),
   ]);
   Promise.all([ready, minShow]).then(() => {
     root.classList.add("is-loaded");

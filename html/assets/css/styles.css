@@ -1492,3 +1492,63 @@ html.is-intro-locked, html.is-intro-locked body { overflow: hidden; overscroll-b
   .js:not(.is-loaded) .hero [data-reveal], .js:not(.is-loaded) .hero-word, .js:not(.is-loaded) .nav,
   .js:not(.is-loaded) .hero-tags .chip, .js:not(.is-loaded) .hero-still--start { opacity: 1; transform: none; translate: none; clip-path: none; }
 }
+
+/* ==========================================================================
+   v4 — Hero polish: headline fit & alignment, spotlight stage, readable wordmark
+   ========================================================================== */
+/* Headline scales with both width and height, so it never collides with the nav or the About sheet */
+.hero { padding-top: calc(var(--nav-h) + clamp(12px, 3vh, 36px)); }
+.hero-copy { max-width: 500px; }
+.hero-title { font-size: clamp(46px, min(6.2vw, 9.4vh), 102px); line-height: .9; letter-spacing: .006em; }
+.hero-title > span { display: block; width: max-content; }
+.js .hero-title .w { padding-bottom: .04em; margin-bottom: -.04em; }
+/* "FOUNDER." — gradient painted per word so it always renders */
+.hero-title > span:last-child { color: var(--accent); background: none; -webkit-background-clip: border-box; background-clip: border-box; }
+.hero-title > span:last-child .w > span {
+  background: linear-gradient(180deg, var(--accent-2) 0%, var(--accent) 50%, var(--accent-deep) 100%);
+  -webkit-background-clip: text; background-clip: text; color: transparent;
+}
+.hero-text { margin-top: clamp(14px, 2.8vh, 28px); }
+.hero-cta { margin-top: clamp(16px, 3.2vh, 30px); }
+.stats { margin-top: clamp(14px, 3vh, 28px); }
+.stat { padding: clamp(11px, 1.7vh, 16px) 18px clamp(10px, 1.6vh, 15px); }
+.stat strong { font-size: clamp(30px, 4.6vh, 40px); }
+
+/* Stage: replace the orbit rings with a soft spotlight halo and a floor shadow */
+.hero::before {
+  content: ""; position: absolute; left: 50%; bottom: 0; top: auto; z-index: 0; translate: -50% 0;
+  width: min(1100px, 78vw); height: 100%; aspect-ratio: auto; border-radius: 0;
+  animation: none; rotate: none;
+  -webkit-mask-image: none; mask-image: none;
+  background:
+    radial-gradient(42% 46% at 50% 44%, rgba(255,190,128,.26) 0%, rgba(255,190,128,.09) 52%, transparent 74%),
+    radial-gradient(30% 5.5% at 50% 97%, rgba(12,26,46,.20) 0%, rgba(12,26,46,.06) 55%, transparent 80%);
+}
+.hero-stage::before { display: none; }
+.hero-stage::after { left: 26%; right: 26%; bottom: 1.5%; height: 4%; background: radial-gradient(closest-side, rgba(12,26,46,.28), transparent); filter: blur(5px); }
+.hero::after {
+  -webkit-mask-image: radial-gradient(48% 50% at 82% 32%, #000, transparent 72%), radial-gradient(40% 46% at 14% 70%, #000, transparent 72%);
+  mask-image: radial-gradient(48% 50% at 82% 32%, #000, transparent 72%), radial-gradient(40% 46% at 14% 70%, #000, transparent 72%);
+  opacity: .8;
+}
+
+/* KIRAN wordmark: tinted fill + firmer outline, stronger while Kiran walks and talks */
+.hero-word {
+  color: transparent;
+  -webkit-text-stroke: 1.6px rgba(12,26,46,.17);
+  background: linear-gradient(180deg, rgba(12,26,46,.11) 0%, rgba(12,26,46,.035) 70%, rgba(12,26,46,.015) 100%);
+  -webkit-background-clip: text; background-clip: text;
+  transition: opacity 1.8s var(--ease) .1s, transform 2.4s cubic-bezier(.16,1,.3,1) .1s, -webkit-text-stroke-color 1.2s var(--ease);
+}
+.hero.is-rolling .hero-word { -webkit-text-stroke-color: rgba(12,26,46,.28); }
+
+/* Crisper presentation of the live cut-out */
+.hero-canvas { image-rendering: auto; }
+
+@media (max-width: 1100px) {
+  .hero-title { font-size: clamp(48px, 13vw, 96px); }
+  .hero::before { width: 120vw; }
+}
+/* Copy aligns with the KC logo on the left; highlight pills align with the nav on the right */
+.hero-grid { max-width: none; }
+@media (min-width: 1600px) { .hero-copy { max-width: 540px; } }
