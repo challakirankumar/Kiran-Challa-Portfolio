@@ -371,8 +371,13 @@
   const btnIcon = $("use", soundBtn);
   const saveData = !!(navigator.connection && navigator.connection.saveData);
   const pinned = matchMedia("(min-width: 1101px)");
+  // Phones/tablets and slow connections get a lighter (544 px wide) cut-out of the same intro.
+  const conn = navigator.connection || {};
+  const lite = !matchMedia("(min-width: 1101px)").matches || /(^|-)2g|3g/.test(conn.effectiveType || "");
   const SOURCES = {
-    alpha: { mp4: "assets/video/kiran-intro-alpha.mp4", webm: "assets/video/kiran-intro-alpha.webm" },
+    alpha: lite
+      ? { mp4: "assets/video/kiran-intro-alpha-m.mp4", webm: "assets/video/kiran-intro-alpha-m.webm" }
+      : { mp4: "assets/video/kiran-intro-alpha.mp4", webm: "assets/video/kiran-intro-alpha.webm" },
     plain: { mp4: "assets/video/kiran-intro.mp4", webm: "assets/video/kiran-intro.webm" },
   };
   const canMp4 = !!video.canPlayType('video/mp4; codecs="avc1.640028, mp4a.40.2"');

@@ -1552,3 +1552,129 @@ html.is-intro-locked, html.is-intro-locked body { overflow: hidden; overscroll-b
 /* Copy aligns with the KC logo on the left; highlight pills align with the nav on the right */
 .hero-grid { max-width: none; }
 @media (min-width: 1600px) { .hero-copy { max-width: 540px; } }
+
+/* ==========================================================================
+   v5 — Compact nav, premium ID card
+   ========================================================================== */
+/* Nav: slimmer capsule, finer type */
+@media (min-width: 861px) {
+  .nav-links { padding: 4px; gap: 0; }
+  .nav-links a { padding: 6px 12px; font-size: 12.5px; font-weight: 600; letter-spacing: .01em; line-height: 1.4; }
+  .nav-pill { top: 4px; height: calc(100% - 8px); }
+  .nav-links a[href="#contact"]:not(.is-active) { color: var(--accent-deep); }
+  .brand { width: 36px; height: 36px; font-size: 12px; }
+}
+
+/* ---- Lanyard: woven navy ribbon with orange stitching, chrome clip ---- */
+.lanyard {
+  width: 26px;
+  background:
+    linear-gradient(90deg, transparent 2px, rgba(245,130,31,.85) 2px 3px, transparent 3px calc(100% - 3px), rgba(245,130,31,.85) calc(100% - 3px) calc(100% - 2px), transparent calc(100% - 2px)),
+    repeating-linear-gradient(0deg, rgba(255,255,255,.035) 0 1px, transparent 1px 3px),
+    linear-gradient(90deg, #0a1424 0%, #1c3152 50%, #0a1424 100%);
+  box-shadow: inset 0 0 0 1px rgba(0,0,0,.35), 0 6px 14px rgba(12,26,46,.25);
+}
+.lanyard span { color: rgba(255,196,140,.8); font-size: 7.5px; }
+.clip {
+  position: relative; width: 30px; height: 26px; margin-top: -3px; border-radius: 6px 6px 8px 8px;
+  background: linear-gradient(90deg, #8d939c 0%, #f4f6f8 28%, #b9bfc7 52%, #eef1f4 74%, #868c95 100%);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.9), inset 0 -2px 3px rgba(0,0,0,.25), 0 3px 6px rgba(12,26,46,.3);
+}
+.clip::after { content: ""; position: absolute; left: 50%; bottom: 5px; width: 14px; height: 5px; translate: -50% 0; border-radius: 3px; background: #2c323b; box-shadow: inset 0 1px 2px rgba(0,0,0,.6), 0 1px 0 rgba(255,255,255,.6); }
+
+/* ---- Card body: pearl laminate with guilloché security pattern ---- */
+.badge { width: min(100%, 300px); aspect-ratio: 300 / 448; }
+.badge-face {
+  border-radius: 24px;
+  background:
+    repeating-radial-gradient(circle at 115% 105%, transparent 0 9px, rgba(245,130,31,.06) 9px 10px),
+    repeating-radial-gradient(circle at -15% -5%, transparent 0 11px, rgba(12,26,46,.04) 11px 12px),
+    linear-gradient(165deg, #ffffff 0%, #f7f8fb 55%, #eef1f6 100%);
+  border: 1px solid rgba(12,26,46,.09);
+  box-shadow:
+    inset 0 1px 0 #fff, inset 0 0 0 4px rgba(255,255,255,.55), inset 0 0 0 5px rgba(245,130,31,.18),
+    0 2px 4px rgba(12,26,46,.08), 0 4px 0 -1px rgba(12,26,46,.05), 0 50px 80px -34px rgba(12,26,46,.55);
+}
+/* Holographic foil sweeping over the laminate */
+.badge-holo {
+  position: absolute; inset: 0; z-index: 3; pointer-events: none; border-radius: inherit; mix-blend-mode: soft-light; opacity: .55;
+  background: conic-gradient(from calc(var(--shine-deg, 0deg) + 200deg) at 78% 18%, #ff9a3d, #ffe29a, #9ee7ff, #c7a5ff, #ff9ad5, #ff9a3d);
+  -webkit-mask-image: radial-gradient(60% 45% at 85% 12%, #000 0%, transparent 70%);
+  mask-image: radial-gradient(60% 45% at 85% 12%, #000 0%, transparent 70%);
+  animation: holo 9s linear infinite;
+}
+@property --shine-deg { syntax: "<angle>"; inherits: false; initial-value: 0deg; }
+@keyframes holo { to { --shine-deg: 360deg; } }
+/* Lanyard slot punched through the header */
+.badge-slot {
+  position: absolute; z-index: 4; top: 11px; left: 50%; width: 44px; height: 9px; translate: -50% 0; border-radius: 6px;
+  background: linear-gradient(180deg, #dfe3ea, #f6f7f9); box-shadow: inset 0 2px 3px rgba(0,0,0,.45), 0 1px 0 rgba(255,255,255,.35);
+}
+.badge-strip {
+  height: 44px; padding-top: 14px; align-items: flex-end; padding-bottom: 7px;
+  background: linear-gradient(180deg, #1b2f4e 0%, #0b1626 100%);
+  border-bottom: 2px solid transparent;
+  border-image: linear-gradient(90deg, transparent, #f5821f 20%, #ffc27a 50%, #f5821f 80%, transparent) 1;
+  color: rgba(255,200,145,.92); font-size: 8.5px;
+}
+
+/* Photo: gold-rimmed frame with a holographic verified seal */
+.photo-frame { position: relative; margin-top: 4px; }
+.badge-photo {
+  width: 104px; padding: 3px; border-radius: 16px;
+  background: linear-gradient(145deg, #ffd59c 0%, #f5821f 35%, #ffe3b8 55%, #c95f05 100%);
+  box-shadow: 0 14px 26px -12px rgba(12,26,46,.55), 0 0 0 1px rgba(150,70,0,.25);
+}
+.badge-photo picture, .badge-photo img { display: block; width: 100%; height: 100%; border-radius: 13px; }
+.badge-photo img { box-shadow: inset 0 0 0 2px #fff; border: 2px solid #fff; }
+.badge-seal {
+  position: absolute; right: -12px; bottom: -8px; width: 30px; height: 30px; border-radius: 50%; display: grid; place-items: center;
+  background: conic-gradient(from 0deg, #ffb35e, #ffe29a, #9ee7ff, #c7a5ff, #ff9ad5, #ffb35e);
+  box-shadow: 0 0 0 2.5px #fff, 0 6px 12px -4px rgba(12,26,46,.5), inset 0 1px 2px rgba(255,255,255,.8);
+  animation: sealSpin 12s linear infinite;
+}
+.badge-seal .icon { width: 15px; height: 15px; stroke: #0c1a2e; stroke-width: 2.6; animation: sealSpin 12s linear infinite reverse; }
+@keyframes sealSpin { to { rotate: 360deg; } }
+
+/* Typography */
+.badge-name { margin-top: 14px; font-family: var(--font-display); font-weight: 400; font-size: 25px; letter-spacing: .06em; line-height: 1; color: var(--ink); text-transform: uppercase; text-shadow: 0 1px 0 #fff, 0 -1px 0 rgba(12,26,46,.08); }
+.badge-role { margin-top: 5px; font-size: 9px; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; color: var(--accent-deep); }
+.badge-rows { margin-top: 14px; border-top: 0; display: grid; gap: 6px; }
+.badge-rows div { padding: 7px 10px; border: 1px solid rgba(12,26,46,.07); border-radius: 10px; background: rgba(255,255,255,.75); box-shadow: inset 0 1px 0 #fff, 0 1px 2px rgba(12,26,46,.05); }
+.badge-rows dt { font-size: 8.5px; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; color: var(--faint); align-self: center; }
+.badge-rows dd { font-size: 10.5px; color: var(--ink); }
+.badge-rows dd.mono { font-family: var(--font-mono); font-weight: 500; letter-spacing: .08em; }
+
+/* Footer: gold contact chip + QR */
+.badge-foot { margin-top: auto; width: 100%; display: flex; align-items: flex-end; justify-content: space-between; padding-top: 10px; }
+.badge-foot .badge-qr { margin: 0; padding: 0; }
+.badge-chip {
+  position: relative; width: 40px; height: 31px; border-radius: 7px; margin-bottom: 14px;
+  background: linear-gradient(135deg, #f7d79b 0%, #d8a24a 30%, #f9e3b0 52%, #b9802c 78%, #e9c27a 100%);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.7), inset 0 -1px 1px rgba(110,70,10,.4), 0 2px 4px rgba(12,26,46,.25);
+}
+.badge-chip::before, .badge-chip::after, .badge-chip i {
+  content: ""; position: absolute; border: 1px solid rgba(110,70,10,.45);
+}
+.badge-chip::before { inset: 6px 13px; border-radius: 3px; }
+.badge-chip::after { left: 0; right: 0; top: 50%; height: 0; border-width: 1px 0 0; }
+.badge-chip i { top: 0; bottom: 0; left: 50%; width: 0; border-width: 0 0 0 1px; }
+.badge-qr svg { width: 54px; height: 54px; padding: 4px; border-radius: 8px; background: #fff; box-shadow: 0 0 0 1px rgba(12,26,46,.08), 0 4px 10px -6px rgba(12,26,46,.4); }
+.badge-qr small { color: var(--muted); font-weight: 600; }
+
+/* Back face refinements */
+.badge-back .badge-body { padding-top: 18px; }
+.back-head h4 { font-family: var(--font-display); font-weight: 400; font-size: 24px; letter-spacing: .05em; text-transform: uppercase; }
+.back-list dt { color: var(--accent-deep); font-weight: 700; }
+.back-list div { padding-bottom: 7px; border-bottom: 1px dashed rgba(12,26,46,.1); }
+.signature { color: var(--ink); }
+.back-foot svg { width: 50px; height: 50px; padding: 4px; border-radius: 8px; background: #fff; box-shadow: 0 0 0 1px rgba(12,26,46,.08); }
+.badge-hint { letter-spacing: .14em; }
+@media (prefers-reduced-motion: reduce) { .badge-holo, .badge-seal, .badge-seal .icon { animation: none; } }
+/* Laminate gloss starts below the navy header so the header stays deep navy */
+.badge-face::before { background: linear-gradient(180deg, transparent 0 44px, rgba(255,255,255,.5) 44px, rgba(255,255,255,0) 30%); }
+.badge-face::after { top: 44px; }
+.badge-strip { position: relative; z-index: 2; }
+.badge-seal, .badge-seal .icon { animation: none; }
+.badge-seal::before { content: ""; position: absolute; inset: 3px; border-radius: 50%; background: radial-gradient(circle at 35% 30%, #fff 0%, #fff6ea 60%, #ffe2bf 100%); box-shadow: inset 0 1px 2px rgba(150,70,0,.25); }
+.badge-seal .icon { position: relative; stroke: var(--accent-deep); }
