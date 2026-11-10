@@ -364,10 +364,15 @@
   // Phones/tablets and slow connections get a lighter (544 px wide) cut-out of the same intro.
   const conn = navigator.connection || {};
   const lite = !matchMedia("(min-width: 1101px)").matches || /(^|-)2g|3g/.test(conn.effectiveType || "");
+  // Large / high-density desktop screens get the AI-upscaled HD cut-out (1344x2044), as long
+  // as the connection and GPU are up to it; it falls back to the standard file on any error.
+  const shownPx = Math.min(window.innerHeight - 64, 1060) * (window.devicePixelRatio || 1);
+  let hd = !lite && shownPx > 1250 && !(conn.downlink && conn.downlink < 5) && !saveData;
+  const STD = { mp4: "assets/video/kiran-intro-alpha.mp4", webm: "assets/video/kiran-intro-alpha.webm" };
   const SOURCES = {
     alpha: lite
       ? { mp4: "assets/video/kiran-intro-alpha-m.mp4", webm: "assets/video/kiran-intro-alpha-m.webm" }
-      : { mp4: "assets/video/kiran-intro-alpha.mp4", webm: "assets/video/kiran-intro-alpha.webm" },
+      : hd ? { mp4: "assets/video/kiran-intro-alpha-hd.mp4", webm: "assets/video/kiran-intro-alpha-hd.webm" } : STD,
     plain: { mp4: "assets/video/kiran-intro.mp4", webm: "assets/video/kiran-intro.webm" },
   };
   const canMp4 = !!video.canPlayType('video/mp4; codecs="avc1.640028, mp4a.40.2"');
@@ -387,8 +392,11 @@
     g.attachShader(prog, shader(g.VERTEX_SHADER,
       "attribute vec2 p;varying vec2 uv;void main(){uv=vec2(p.x*.5+.5,.5-p.y*.5);gl_Position=vec4(p,0.,1.);}"));
     g.attachShader(prog, shader(g.FRAGMENT_SHADER,
-      "precision mediump float;varying vec2 uv;uniform sampler2D t;" +
-      "void main(){vec3 c=texture2D(t,vec2(uv.x,uv.y*.4995)).rgb;float a=texture2D(t,vec2(uv.x,.5005+uv.y*.4995)).r;" +
+      "precision mediump float;varying vec2 uv;uniform sampler2D t;uniform float sbs;" +
+      // colour + matte are packed top/bottom (sbs=0) or side by side (sbs=1, the HD file)
+      "void main(){vec2 cu=mix(vec2(uv.x,uv.y*.4995),vec2(uv.x*.4995,uv.y),sbs);" +
+      "vec2 au=mix(vec2(uv.x,.5005+uv.y*.4995),vec2(.5005+uv.x*.4995,uv.y),sbs);" +
+      "vec3 c=texture2D(t,cu).rgb;float a=texture2D(t,au).r;" +
       "a=smoothstep(.04,.96,a);gl_FragColor=vec4(c*a,a);}"));
     g.linkProgram(prog);
     if (!g.getProgramParameter(prog, g.LINK_STATUS)) return null;
@@ -404,8 +412,15 @@
     [[g.TEXTURE_WRAP_S, g.CLAMP_TO_EDGE], [g.TEXTURE_WRAP_T, g.CLAMP_TO_EDGE],
      [g.TEXTURE_MIN_FILTER, g.LINEAR], [g.TEXTURE_MAG_FILTER, g.LINEAR]].forEach(([k, v]) => g.texParameteri(g.TEXTURE_2D, k, v));
     g.clearColor(0, 0, 0, 0);
+    const uSbs = g.getUniformLocation(prog, "sbs");
+    if (hd && g.getParameter(g.MAX_TEXTURE_SIZE) < 4096) hd = false;
     return {
       draw() {
+        const vw = video.videoWidth, vh = video.videoHeight;
+        const side = vw > vh;
+        const cw = side ? vw / 2 : vw, ch = side ? vh : vh / 2;
+        if (cw && (cv.width !== cw || cv.height !== ch)) { cv.width = cw; cv.height = ch; }
+        g.uniform1f(uSbs, side ? 1 : 0);
         g.texImage2D(g.TEXTURE_2D, 0, g.RGB, g.RGB, g.UNSIGNED_BYTE, video); // throws if the video is cross-origin (e.g. file://)
         g.viewport(0, 0, cv.width, cv.height);
         g.clear(g.COLOR_BUFFER_BIT);
@@ -426,8 +441,16 @@
     video.currentTime = t;
     if (wasPlaying) video.play().catch(() => {});
   };
-  if (renderer) video.src = pick(SOURCES.alpha);
+  if (renderer) video.src = pick(hd || lite ? SOURCES.alpha : STD);
   else { hero.classList.add("no-gl"); video.src = pick(SOURCES.plain); }
+  // HD file can't be decoded on this device → quietly drop to the standard cut-out.
+  video.addEventListener("error", () => {
+    if (!hd || !renderer) return;
+    hd = false;
+    const wasPlaying = state === "playing";
+    video.src = pick(STD);
+    if (wasPlaying) video.play().catch(() => {});
+  });
 
   const drawFrame = () => {
     if (!renderer || video.readyState < 2) return;
